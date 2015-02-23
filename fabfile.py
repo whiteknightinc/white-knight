@@ -166,9 +166,13 @@ def _unlink_supervisor():
 def _start_app():
     sudo('python whiteapp.py')
 
+def _install_reqs():
+    sudo('pip install -r requirements.txt')
+
 
 def deploy():
     os.system('rsync -r  newstuff/* ubuntu@ec2-52-10-245-150.us-west-2.compute.amazonaws.com:~/')
+    run_command_on_selected_server(_install_reqs)
     run_command_on_selected_server(_restart_nginx)
     # run_command_on_selected_server(_unlink_supervisor)
     # run_command_on_selected_server(_run_supervisor)
