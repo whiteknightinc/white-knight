@@ -2,6 +2,8 @@ from wsgiref.simple_server import make_server
 from pyramid.config import Configurator
 from pyramid.response import Response
 from pyramid.view import view_config
+from waitress import serve
+import os
 import jinja2
 
 
@@ -23,8 +25,6 @@ def app():
     return app
 
 if __name__ == '__main__':
-
     # config.add_view(hello_world, route_name='hello')
     app = app()
-    server = make_server('0.0.0.0', 8080, app)
-    server.serve_forever()
+    serve(app, host='0.0.0.0', port=8080)
