@@ -1,5 +1,5 @@
 import sqlalchemy as sa
-import praw
+# import praw
 import os
 from scraper import get_comments
 from sqlalchemy.ext.declarative import declarative_base
@@ -24,15 +24,16 @@ class Comments(Base):
     @classmethod
     def create(cls, comments, reddit):
         for comment in comments:
-            text = comments[comment][text]
-            user = comments[comment][user]
-            permalink = comments[comment][permalink]
+            text = comments[comment]['text']
+            user = comments[comment]['user']
+            permalink = comments[comment]['permalink']
             reddit = reddit
             new_entry = cls(text=text, user=user, reddit=reddit, permalink=permalink)
             DBSession.add(new_entry)
 
 def get_comments_from_reddit():
-    Comments.create(get_comments, reddit=True)
+    comments = get_comments()
+    Comments.create(comments, reddit=True)
 
 def main():
     settings = {}
