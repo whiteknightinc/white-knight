@@ -22,13 +22,14 @@ class Comments(Base):
     permalink = sa.Column(sa.String, nullable=False)
 
     @classmethod
-    def create(cls, comment, reddit):
-        text = comment.body
-        user = comment.author
-        reddit = reddit
-        permalink = comment.permalink
-        new_entry = cls(text=text, user=user, reddit=reddit, permalink=permalink)
-        DBSession.add(new_entry)
+    def create(cls, comments, reddit):
+        for comment in comments:
+            text = comments[comment][text]
+            user = comments[comment][user]
+            permalink = comments[comment][permalink]
+            reddit = reddit
+            new_entry = cls(text=text, user=user, reddit=reddit, permalink=permalink)
+            DBSession.add(new_entry)
 
 def get_comments_from_reddit():
     Comments.create(get_comments, reddit=True)
@@ -37,12 +38,13 @@ def main():
     settings = {}
     settings['sqlalchemy.url'] = os.environ.get(
         ### FIX THE DB URL FORMAT, MUST BE rfc1738 URL
-        'DATABASE_URL', 'postgresql://edward:@/learning_journal'
+        'DATABASE_URL', 'postgresql://edward:@/whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
+    get_comments_from_reddit()
 
 if __name__ == '__main__':
     app = main()
-    port = os.environ.get('PORT', 5000)
+    port = os.environ.get('PORT', 9000)
     serve(app, host='0.0.0.0', port=port)
