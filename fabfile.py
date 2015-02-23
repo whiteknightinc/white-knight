@@ -163,8 +163,13 @@ def _unlink_supervisor():
     sudo('sudo unlink /tmp/supervisor.sock')
 
 
+def _start_app():
+    sudo('python whiteapp.py')
+
+
 def deploy():
     os.system('rsync -r  newstuff/* ubuntu@ec2-52-10-176-172.us-west-2.compute.amazonaws.com:~/')
     run_command_on_selected_server(_restart_nginx)
-    run_command_on_selected_server(_unlink_supervisor)
-    run_command_on_selected_server(_run_supervisor)
+    # run_command_on_selected_server(_unlink_supervisor)
+    # run_command_on_selected_server(_run_supervisor)
+    run_command_on_selected_server(_start_app)
