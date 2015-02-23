@@ -67,11 +67,21 @@ text-decoration: none;
 GALLERY
 *********/
 
-#main-title {
+#home-header {
     color: #fff;
     font-family: 'Lobster', sans-serif;
     font-size: 2em;
     text-shadow: 1px 1px 15px #555;
+}
+
+.shame-post {
+    margin: auto;
+    width: 60%;
+    text-align: center;
+    background-color: #eee;
+    padding-bottom: 15px;
+    box-shadow: 6px 6px 10px rgba(0,0,0,.5);
+    border-radius: 10px;
 }
 
 
