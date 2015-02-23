@@ -24,7 +24,7 @@ def book(book_id):
 
 def books():
     all_books = DB.titles()
-    body = ['<h1>My Bookshelf Edited</h1>', '<ul>']
+    body = ['<h1>My Bookshelf Edited Again</h1>', '<ul>']
     item_template = '<li><a href="/book/{id}">{title}</a></li>'
     for book in all_books:
         body.append(item_template.format(**book))

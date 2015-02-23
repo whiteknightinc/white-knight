@@ -168,7 +168,7 @@ def _start_app():
 
 
 def deploy():
-    os.system('rsync -r  newstuff/* ubuntu@ec2-52-10-176-172.us-west-2.compute.amazonaws.com:~/')
+    os.system('rsync -r  newstuff/* ubuntu@ec2-52-10-245-150.us-west-2.compute.amazonaws.com:~/')
     run_command_on_selected_server(_restart_nginx)
     # run_command_on_selected_server(_unlink_supervisor)
     # run_command_on_selected_server(_run_supervisor)
