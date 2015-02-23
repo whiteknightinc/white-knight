@@ -1,5 +1,6 @@
 import sqlalchemy as sa
 import praw
+import os
 from scraper import get_comments
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import (
@@ -31,3 +32,17 @@ class Comments(Base):
 
 def get_comments_from_reddit():
     Comments.create(get_comments, reddit=True)
+
+def main():
+    settings = {}
+    settings['sqlalchemy.url'] = os.environ.get(
+        ### FIX THE DB URL FORMAT, MUST BE rfc1738 URL
+        'DATABASE_URL', 'postgresql://edward:@/learning_journal'
+    )
+    engine = sa.engine_from_config(settings, 'sqlalchemy.')
+    DBSession.configure(bind=engine)
+
+if __name__ == '__main__':
+    app = main()
+    port = os.environ.get('PORT', 5000)
+    serve(app, host='0.0.0.0', port=port)
