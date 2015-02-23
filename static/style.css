@@ -1,0 +1,99 @@
+/*********
+BODY
+*********/
+
+body {
+  background: linear-gradient(#66ccee, transparent 80%);
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+
+/*********
+HEADER
+*********/
+
+
+header {
+    height: 200px;
+    margin-bottom: 150px;
+  }
+
+
+h2 {
+text-align: center;
+color: white;
+font-family: 'Roboto Condensed', sans-serif;
+font-weight: 300;
+margin-top: -50px;
+}
+
+
+a {
+color: white;
+text-decoration: none;
+}
+
+
+#logo {
+    text-shadow: 5px 5px 10px #777;
+    font-family: 'Lobster', sans-serif;
+    margin-left: 10px;
+    font-size: 1.5em;
+    text-align: center;
+}
+
+.admin-login {
+    font-family: 'Roboto Condensed', sans-serif;
+    float: right;
+    font-size: 1em;
+    margin-right: 10px;
+    margin-top: 10px;
+    font-weight: 300;
+}
+
+.subunit {
+    margin: auto;
+}
+
+.subtitle {
+    margin-top: -50px;
+}
+
+/*********
+GALLERY
+*********/
+
+#home-header {
+    color: #fff;
+    font-family: 'Lobster', sans-serif;
+    font-size: 2em;
+    text-shadow: 1px 1px 15px #555;
+}
+
+.shame-post {
+    margin: auto;
+    width: 60%;
+    text-align: center;
+    background-color: #eee;
+    padding-bottom: 15px;
+    box-shadow: 6px 6px 10px rgba(0,0,0,.5);
+    border-radius: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
