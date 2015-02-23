@@ -10,7 +10,7 @@ def get_comments():
 
     for top_post in top_posts:
         submission = r.get_submission(submission_id=top_post.id)
-        submission.replace_more_comments(limit=5, threshold=0)
+        submission.replace_more_comments(limit=32, threshold=0)
         all_comments = submission.comments
         comments = praw.helpers.flatten_tree(all_comments)
 
@@ -20,3 +20,7 @@ def get_comments():
             for keyword in keywords:
                 if keyword in words:
                     comments_with_keywords.append(comment)
+    return comments_with_keywords
+
+if __name__ == '__main__':
+    print get_comments()
