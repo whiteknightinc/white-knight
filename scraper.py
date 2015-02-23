@@ -5,7 +5,6 @@ keywords = []
 for line in f:
     keywords.append(line.rstrip())
 f.close()
-print keywords
 
 
 def get_comments():
@@ -13,7 +12,6 @@ def get_comments():
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     top_posts = r.get_subreddit('gaming').get_top(limit=1)
-    # keywords = ['fuck', 'shit', 'damn']
     comments_with_keywords = []
 
     for top_post in top_posts:
