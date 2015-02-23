@@ -1,15 +1,13 @@
 {% extends "base.jinja2" %}
 {% block body %}
-  <hr>
   <h2 id="home-header">Recently Shamed</h2>
-  <hr>
-<div id="front-shame">
+  <div id="front-shame">
     {% for entry in entries %}
     <article class="shame-post" id="entry{{entry.id}}">
-            <h3>{{ entry.username }}</h3>
+            <h3>{{ entry.user }}</h3>
             <div class="post">
               <div class="comment_body" id ="detail_post">
-                {{ entry.render_markdown()|safe }}
+                {{ entry.text()|safe }}
               </div>
             </div>
           </a>

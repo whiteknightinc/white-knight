@@ -7,9 +7,13 @@ import os
 import jinja2
 
 
+here = os.path.dirname(os.path.abspath(__file__))
+
+
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
     return {}
+
 
 def hello_world(request):
     print('Incoming request')
@@ -18,6 +22,7 @@ def hello_world(request):
 
 def app():
     config = Configurator()
+    config.add_static_view('static', os.path.join(here, 'static'))
     config.include('pyramid_jinja2')
     config.add_route('home', '/')
     config.scan()
