@@ -29,13 +29,13 @@ def get_nasty_tweets():
     for i in range(len(tweets_with_keywords)):
         user = tweets[i].user.name
         ident = tweets[i].id
-        permalink = "www.twitter.com/"+user+"/status/"+str(ident)
+        permalink = "www.twitter.com/" + user + "/status/" + str(ident)
         text = tweets[i].text
         shitty_tweets[i] = {
             'text': text,
             'user': user,
             'permalink': permalink
-            }
+        }
     return shitty_tweets
 
 
@@ -54,7 +54,4 @@ def tweet_it_out():
 
 
 if __name__ == '__main__':
-    # tweetdict = get_nasty_tweets()
-    # for i in range(len(tweetdict)):
-    #     print tweetdict[i]['text']
-    tweet_it_out()
+

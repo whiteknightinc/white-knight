@@ -6,10 +6,6 @@ def get_comments(subreddit, subnumber):
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    # for top_post in top_posts:
-    #     print 'this top post id is: ' + top_post.id
-    # print 'subnumber is: ' + str(subnumber)
-    # print 'is subnumer 1:' + str(subnumber == 1)
     comments_with_keywords = []
     f = open("swearWordsValue.txt")
     keywords = {}
@@ -20,7 +16,6 @@ def get_comments(subreddit, subnumber):
 
     for top_post in top_posts:
         submission = r.get_submission(submission_id=top_post.id)
-        # import pdb; pdb.set_trace()
         submission.replace_more_comments(limit=32, threshold=0)
         all_comments = submission.comments
         comments = praw.helpers.flatten_tree(all_comments)

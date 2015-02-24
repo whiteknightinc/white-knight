@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -39,7 +39,10 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
-    return {'comments': Comments.all()}
+    if request.authenticated_userid:
+        return {'comments': Comments.all()}
+    else:
+        return HTTPForbidden()
 
 
 class Comments(Base):
@@ -69,7 +72,7 @@ class Comments(Base):
         return DBSession.query(cls).order_by(cls.id.desc()).all()
 
 
-def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
+def get_comments_from_reddit(subreddit, subnumber):
     comments = get_comments(subreddit, subnumber)
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
@@ -100,6 +103,8 @@ def get_entries():
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
+    if subreddit == "":
+        subreddit = 'whiteknighttest'
     subnumber = int(request.params.get('sub_number', None))
     # try:
     get_comments_from_reddit(subreddit, subnumber)
