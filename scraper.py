@@ -1,5 +1,11 @@
 import praw
 
+f = open("swearWords.txt")
+keywords = []
+for line in f:
+    keywords.append(line.rstrip())
+f.close()
+
 def get_comments():
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
@@ -25,7 +31,7 @@ def get_comments():
     for num in range(len(comments_with_keywords)):
         result[num] = {}
         result[num]['text'] = comments_with_keywords[num].body
-        result[num]['user'] = comments_with_keywords[num].author
+        result[num]['user'] = comments_with_keywords[num].author.name
         result[num]['permalink'] = comments_with_keywords[num].permalink
     return result
 
