@@ -21,7 +21,7 @@ def get_comments(subreddit, subnumber):
     for top_post in top_posts:
         submission = r.get_submission(submission_id=top_post.id)
         # import pdb; pdb.set_trace()
-        submission.replace_more_comments(limit=32, threshold=0)  
+        submission.replace_more_comments(limit=32, threshold=0)
         all_comments = submission.comments
         comments = praw.helpers.flatten_tree(all_comments)
 
