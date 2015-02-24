@@ -51,11 +51,12 @@ def main():
 
 def get_entries():
     entries = Comments.all()
-    return {'entries': entries}
+    for entry in entries:
+        print entry.text
 
 if __name__ == '__main__':
     app = main()
-    print get_entries()
+    get_entries()
 
 # from sqlalchemy import create_engine
 # engine = create_engine('postgresql://edward:@/whiteknight')
