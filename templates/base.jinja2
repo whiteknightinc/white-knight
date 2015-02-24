@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>White Knight</title>
+    <link href='http://fonts.googleapis.com/css?family=Lobster|Roboto+Condensed:300italic,700,300,400' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../static/style.css">
+  </head>
+  <body>
+    <header>
+      <div class="admin-login">
+        {% if not request.authenticated_userid %}
+        <a href="{{ request.route_url('login') }}">Log in</a>
+        {% else %}
+        <a href="{{ request.route_url('logout') }}">Log out</a>
+        {% endif %}
+      </div>
+      <a href="/" id="logo"><h1><center>Because People Are Terrible</center></h1></a>
+      <div class="subtitle">
+        <h2 class="subunit"><a href="https://twitter.com/KnightShame">@KnightShame</a></h2>
+        <h2 class="subunit"><a href="http://www.reddit.com/r/whiteknighttest/">/r/WhiteKnight</a></h2>
+      </div>
+    </header>
+    <main>
+    {% block body %}{% endblock %}
+    </main>
+		<footer>
+		</footer>
+  </body>
+</html>

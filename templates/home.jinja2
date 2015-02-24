@@ -1,0 +1,20 @@
+{% extends "base.jinja2" %}
+{% block body %}
+  <h2 class="home-header">Recently Shamed</h2>
+  <div id="front-shame">
+    {% for entry in entries %}
+    <article class="shame-post" id="entry{{entry.id}}">
+            <h3>{{ entry.user }}</h3>
+            <div class="post">
+              <div class="comment_body" id ="detail_post">
+                {{ entry.text()|safe }}
+              </div>
+            </div>
+          </a>
+    </article>
+    {% else %}
+    <div class="entry">
+      <p><em>No shameful posts yet</em></p>
+    </div>
+    {% endfor %}
+{% endblock %}
