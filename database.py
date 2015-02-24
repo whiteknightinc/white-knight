@@ -17,19 +17,23 @@ class Comments(Base):
     __tablename__ = 'comment'
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     text = sa.Column(sa.UnicodeText, nullable=False)
-    user = sa.Column(sa.UnicodeText, nullable=False)
+    username = sa.Column(sa.Unicode(127), nullable=False)
     reddit = sa.Column(sa.Boolean, nullable=False)
-    permalink = sa.Column(sa.String, nullable=False)
+    permalink = sa.Column(sa.Unicode(127), nullable=False)
 
     @classmethod
     def create(cls, comments, reddit):
         for comment in comments:
             text = comments[comment]['text']
-            user = comments[comment]['user']
+            username = comments[comment]['user']
             permalink = comments[comment]['permalink']
             reddit = reddit
-            new_entry = cls(text=text, user=user, reddit=reddit, permalink=permalink)
+            new_entry = cls(text=text, username=username, reddit=reddit, permalink=permalink)
             DBSession.add(new_entry)
+
+    @classmethod
+    def all(cls):
+        return DBSession.query(cls).order_by(cls.id).all()
 
 def get_comments_from_reddit():
     comments = get_comments()
@@ -45,7 +49,14 @@ def main():
     DBSession.configure(bind=engine)
     get_comments_from_reddit()
 
+def get_entries():
+    entries = Comments.all()
+    return {'entries': entries}
+
 if __name__ == '__main__':
     app = main()
-    port = os.environ.get('PORT', 9000)
-    serve(app, host='0.0.0.0', port=port)
+    print get_entries()
+
+# from sqlalchemy import create_engine
+# engine = create_engine('postgresql://edward:@/whiteknight')
+# engine = create_engine('postgresql+psycopg2://scott:tiger@localhost/mydatabase')

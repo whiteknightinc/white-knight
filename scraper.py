@@ -4,7 +4,7 @@ def get_comments():
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
 
-    top_posts = r.get_subreddit('whiteknighttest').get_top(limit=1)
+    top_posts = r.get_subreddit('whiteknighttest').get_top(limit=10)
     keywords = ['fuck', 'shit', 'damn']
     comments_with_keywords = []
 
@@ -19,7 +19,6 @@ def get_comments():
             for keyword in keywords:
                 if keyword in words:
                     comments_with_keywords.append(comment)
-                    print(comment.body)
                     break
 
     result = {}
@@ -31,4 +30,4 @@ def get_comments():
     return result
 
 if __name__ == '__main__':
-    print get_comments()
+    get_comments()
