@@ -1,4 +1,5 @@
 import sqlalchemy as sa
+import transaction
 # import praw
 import os
 from scraper import get_comments
@@ -29,6 +30,7 @@ class Comments(Base):
         reddit = reddit
         new_entry = cls(text=text, username=username, reddit=reddit, permalink=permalink)
         DBSession.add(new_entry)
+        transaction.commit()
 
     @classmethod
     def all(cls):
