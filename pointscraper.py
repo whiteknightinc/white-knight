@@ -23,9 +23,9 @@ def get_comments():
         comments = praw.helpers.flatten_tree(all_comments)
 
         for comment in comments:
-            words = comment.body.lower()
+            words = comment.body
             response = toolkit.text2sentiment(words.encode('utf-8'))
-            if response['score'] < -2:
+            if response['score'] <= -3:
                 print comment.body
                 comments_with_keywords.append(comment)
             # for keyword in keywords.keys():
