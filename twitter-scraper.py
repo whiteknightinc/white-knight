@@ -12,8 +12,8 @@ def tweep():
 
     api = tweepy.API(auth)
 
-    tweet = api.home_timeline(count=1)
-    print tweet[0].text
+    tweep = api.home_timeline(count=3)
+
 
 if __name__ == '__main__':
     tweep()
