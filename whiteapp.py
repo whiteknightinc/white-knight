@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -17,6 +17,7 @@ from sqlalchemy.orm import (
 import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
+from twitter_scraper import get_nasty_tweets
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -38,7 +39,10 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
-    return {'comments': Comments.all()}
+    if request.authenticated_userid:
+        return {'comments': Comments.all()}
+    else:
+        return HTTPForbidden()
 
 
 class Comments(Base):
@@ -75,6 +79,13 @@ def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
             Comments.create(comments[comment], reddit=True)
 
 
+def get_tweets():
+    tweets = get_nasty_tweets()
+    for tweet in tweets:
+        if not has_entry(tweets[tweet]['permalink']):
+            Comments.create(tweets[tweet], reddit=False)
+
+
 def has_entry(permalink):
         # dictionary of permalinks
         entries = Comments.all()
@@ -106,7 +117,7 @@ def main():
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://edward:@/whiteknight'
+        'DATABASE_URL', 'postgresql:///whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
