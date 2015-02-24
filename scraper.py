@@ -1,18 +1,17 @@
 import praw
 
-f = open("swearWords.txt")
-keywords = []
-for line in f:
-    keywords.append(line.rstrip())
-f.close()
 
 def get_comments():
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     top_posts = r.get_subreddit('whiteknighttest').get_top(limit=10)
-    keywords = ['fuck', 'shit', 'damn']
     comments_with_keywords = []
+    f = open("swearWords.txt")
+    keywords = []
+    for line in f:
+        keywords.append(line.rstrip())
+    f.close()
 
     for top_post in top_posts:
         submission = r.get_submission(submission_id=top_post.id)
