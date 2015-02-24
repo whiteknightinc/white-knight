@@ -11,10 +11,11 @@ def get_comments(subreddit, subnumber):
     # print 'subnumber is: ' + str(subnumber)
     # print 'is subnumer 1:' + str(subnumber == 1)
     comments_with_keywords = []
-    f = open("swearWords.txt")
-    keywords = []
+    f = open("swearWordsValue.txt")
+    keywords = {}
     for line in f:
-        keywords.append(line.rstrip())
+        word, val = line.rstrip().split(",")
+        keywords[word] = int(val)
     f.close()
 
     for top_post in top_posts:
@@ -25,11 +26,16 @@ def get_comments(subreddit, subnumber):
         comments = praw.helpers.flatten_tree(all_comments)
 
         for comment in comments:
+            score = 0
             words = comment.body.lower()
-            for keyword in keywords:
-                if keyword in words:
-                    comments_with_keywords.append(comment)
-                    break
+            for keyword in keywords.keys():
+                count = words.count(keyword)
+                length = len(words) / 6
+                if count > 0:
+                    score += count * (keywords.get(keyword))
+                    if score >= 10 or score >= length:
+                        comments_with_keywords.append(comment)
+                        break
 
     result = {}
     for num in range(len(comments_with_keywords)):
@@ -40,6 +46,6 @@ def get_comments(subreddit, subnumber):
     return result
 
 if __name__ == '__main__':
-    entries = get_comments('circlejerk', 1)
+    entries = get_comments('whiteknighttest', 1)
     for num in entries:
         print entries[num]['text']
