@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -14,8 +14,10 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
+import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
+from twitter_scraper import get_nasty_tweets
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -26,15 +28,21 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
-    get_comments_from_reddit()
-    read_one_comment()
-    return {'comments': Comments.all()}
+    return {}
 
 
 def read_one_comment():
     comments = Comments.all()
     print comments[0].text
     return {'comments': Comments.all()}
+
+
+@view_config(route_name='feed', renderer='templates/feed.jinja2')
+def feed(request):
+    if request.authenticated_userid:
+        return {'comments': Comments.all()}
+    else:
+        return HTTPForbidden()
 
 
 class Comments(Base):
@@ -46,32 +54,63 @@ class Comments(Base):
     permalink = sa.Column(sa.Unicode(127), nullable=False)
 
     @classmethod
-    def create(cls, comments, reddit):
-        for comment in comments:
-            text = comments[comment]['text']
-            username = comments[comment]['user']
-            permalink = comments[comment]['permalink']
-            reddit = reddit
-            new_entry = cls(text=text,
-                            username=username,
-                            reddit=reddit,
-                            permalink=permalink
-                            )
-            DBSession.add(new_entry)
+    def create(cls, comment, reddit):
+        text = comment['text']
+        username = comment['user']
+        permalink = comment['permalink']
+        reddit = reddit
+        new_entry = cls(text=text,
+                        username=username,
+                        reddit=reddit,
+                        permalink=permalink
+                        )
+        DBSession.add(new_entry)
+        transaction.commit()
 
     @classmethod
     def all(cls):
-        return DBSession.query(cls).order_by(cls.id).all()
+        return DBSession.query(cls).order_by(cls.id.desc()).all()
 
 
-def get_comments_from_reddit():
-    comments = get_comments()
-    Comments.create(comments, reddit=True)
+def get_comments_from_reddit(subreddit, subnumber):
+    comments = get_comments(subreddit, subnumber)
+    for comment in comments:
+        if not has_entry(comments[comment]['permalink']):
+            Comments.create(comments[comment], reddit=True)
+
+
+def get_tweets():
+    tweets = get_nasty_tweets()
+    for tweet in tweets:
+        if not has_entry(tweets[tweet]['permalink']):
+            Comments.create(tweets[tweet], reddit=False)
+
+
+def has_entry(permalink):
+        # dictionary of permalinks
+        entries = Comments.all()
+        for entry in entries:
+            if entry.permalink == permalink:
+                return True
+        return False
 
 
 def get_entries():
     entries = Comments.all()
     return {'entries': entries}
+
+
+@view_config(route_name='scrape', request_method='POST')
+def scrape_reddit(request):
+    subreddit = request.params.get('subreddit', None)
+    if subreddit == "":
+        subreddit = 'whiteknighttest'
+    subnumber = int(request.params.get('sub_number', None))
+    # try:
+    get_comments_from_reddit(subreddit, subnumber)
+    # except:
+    #     return HTTPInternalServerError
+    return HTTPFound(request.route_url('feed'))
 
 
 def main():
@@ -109,6 +148,8 @@ def main():
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('feed', '/feed')
+    config.add_route('scrape', '/scrape')
     config.scan()
     app = config.make_wsgi_app()
     return app
