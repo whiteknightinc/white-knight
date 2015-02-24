@@ -1,6 +1,5 @@
 import praw
 
-
 def get_comments():
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')

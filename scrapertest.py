@@ -14,8 +14,8 @@ def get_comments():
     qComments = []
 
     for top_post in top_posts:
-        submission = r.get_submission(submission_id=top_post.id)
         try:
+            submission = r.get_submission(submission_id=top_post.id)
             submission.replace_more_comments(limit=32, threshold=0)
             all_comments = submission.comments
             comments = praw.helpers.flatten_tree(all_comments)
@@ -26,7 +26,8 @@ def get_comments():
                     if keyword in words:
                         comments_with_keywords.append(comment)
                         break
-        except():
+        except(praw.errors.APIException()):
+            break
     result = {}
     for num in range(len(comments_with_keywords)):
         result[num] = {}
