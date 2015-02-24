@@ -14,6 +14,7 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
+import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
 
@@ -27,6 +28,13 @@ here = os.path.dirname(os.path.abspath(__file__))
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
     get_comments_from_reddit()
+    read_one_comment()
+    return {'comments': Comments.all()}
+
+
+def read_one_comment():
+    comments = Comments.all()
+    print comments[0].text
     return {'comments': Comments.all()}
 
 
@@ -57,6 +65,7 @@ class Comments(Base):
                             permalink=permalink
                             )
             DBSession.add(new_entry)
+        transaction.commit()
 
     @classmethod
     def all(cls):
@@ -79,7 +88,7 @@ def main():
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://nbeck:@localhost:5432/whiteknight'
+        'DATABASE_URL', 'postgresql://roberthaskell:@localhost:5432/whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
