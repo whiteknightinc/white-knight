@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% extends "base.jinja2" %}
+{% block body %}
+  <h2 class="home-header">Feed of Shame</h2>
+  <div class="scrape_fields">
+  <form action="{{ request.route_url('scrape') }}" method="POST">
+    <div class="field">
+      <label for="subreddit">Subreddit: </label>
+      <input type="text" name="subreddit" id="subreddit"/>
+    </div>
+    <div class="field">
+      <label for="sub_number">Number of Threads: </label>
+        <select name="sub_number" id="sub_number">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
+    </div>
+    <div class="control_row">
+      <input type="submit" name="Submit" value="Scrape!"/>
+    </div>
+  </form>
+  <div id="shame-feed">
+  <form action="submit_form.asp">
+    {% for comment in comments %}
+    <article class="shame-post">
+            <h3 class="comment_title">{{ comment.username }}</h3>
+            <div class="post">
+              <div class="comment_body" id ="detail_post">
+                {{ comment.text }}
+              </div>
+            </div>
+          </a>
+    </article>
+    <br>
+    <input type="checkbox" name="post" value="True"><h3>Post To Reddit?</h3>
+    {% endfor %}
+  </form>
+  </div>
+{% endblock %}

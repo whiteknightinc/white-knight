@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -28,15 +28,18 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
-    get_comments_from_reddit()
-    get_tweets()
-    read_one_comment()
-    return {'comments': Comments.all()}
+    return {}
+
 
 
 def read_one_comment():
     comments = Comments.all()
     print comments[0].text
+    return {'comments': Comments.all()}
+
+
+@view_config(route_name='feed', renderer='templates/feed.jinja2')
+def feed(request):
     return {'comments': Comments.all()}
 
 
@@ -64,11 +67,11 @@ class Comments(Base):
 
     @classmethod
     def all(cls):
-        return DBSession.query(cls).order_by(cls.id).all()
+        return DBSession.query(cls).order_by(cls.id.desc()).all()
 
 
-def get_comments_from_reddit():
-    comments = get_comments()
+def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
+    comments = get_comments(subreddit, subnumber)
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
             Comments.create(comments[comment], reddit=True)
@@ -95,13 +98,24 @@ def get_entries():
     return {'entries': entries}
 
 
+@view_config(route_name='scrape', request_method='POST')
+def scrape_reddit(request):
+    subreddit = request.params.get('subreddit', None)
+    subnumber = int(request.params.get('sub_number', None))
+    # try:
+    get_comments_from_reddit(subreddit, subnumber)
+    # except:
+    #     return HTTPInternalServerError
+    return HTTPFound(request.route_url('feed'))
+
+
 def main():
     """Create a configured wsgi app"""
     settings = {}
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://roberthaskell:@localhost:5432/whiteknight'
+        'DATABASE_URL', 'postgresql:///whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
@@ -130,6 +144,8 @@ def main():
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('feed', '/feed')
+    config.add_route('scrape', '/scrape')
     config.scan()
     app = config.make_wsgi_app()
     return app
