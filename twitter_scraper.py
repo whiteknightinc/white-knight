@@ -1,5 +1,5 @@
 import tweepy
-
+import pdb
 
 def get_nasty_tweets():
     consumer_key = 'KSupNP0wNh1PfqdSt1qL2Fj6S'
@@ -21,11 +21,9 @@ def get_nasty_tweets():
     tweets_with_keywords = []
 
     for tweet in tweets:
-        text = tweet.text
         for keyword in keywords:
-            if keyword in text:
+            if keyword in unicode(tweet.text).lower():
                 tweets_with_keywords.append(tweet)
-                break
 
     shitty_tweets = {}
     for i in range(len(tweets_with_keywords)):
@@ -41,4 +39,6 @@ def get_nasty_tweets():
     return shitty_tweets
 
 if __name__ == '__main__':
-    print get_nasty_tweets()
+    tweetdict = get_nasty_tweets()
+    for i in range(len(tweetdict)):
+        print tweetdict[i]['text']
