@@ -102,6 +102,7 @@ def get_entries():
 
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
+    get_tweets()
     subreddit = request.params.get('subreddit', None)
     if subreddit == "":
         subreddit = 'whiteknighttest'
