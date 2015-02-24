@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -27,9 +27,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
-    get_comments_from_reddit()
-    read_one_comment()
-    return {'comments': Comments.all()}
+    return {}
 
 
 def read_one_comment():
@@ -40,7 +38,6 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
-    get_comments_from_reddit()
     return {'comments': Comments.all()}
 
 
@@ -68,11 +65,11 @@ class Comments(Base):
 
     @classmethod
     def all(cls):
-        return DBSession.query(cls).order_by(cls.id).all()
+        return DBSession.query(cls).order_by(cls.id.desc()).all()
 
 
-def get_comments_from_reddit():
-    comments = get_comments()
+def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
+    comments = get_comments(subreddit, subnumber)
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
             Comments.create(comments[comment], reddit=True)
@@ -90,6 +87,17 @@ def has_entry(permalink):
 def get_entries():
     entries = Comments.all()
     return {'entries': entries}
+
+
+@view_config(route_name='scrape', request_method='POST')
+def scrape_reddit(request):
+    subreddit = request.params.get('subreddit', None)
+    subnumber = request.params.get('sub_number', None)
+    try:
+        get_comments_from_reddit(subreddit, subnumber)
+    except:
+        return HTTPInternalServerError
+    return HTTPFound(request.route_url('feed'))
 
 
 def main():
@@ -128,6 +136,7 @@ def main():
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
     config.add_route('feed', '/feed')
+    config.add_route('scrape', '/scrape')
     config.scan()
     app = config.make_wsgi_app()
     return app

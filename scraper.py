@@ -1,10 +1,11 @@
 import praw
 
-def get_comments():
+
+def get_comments(subreddit='whiteknighttest', subnumber='1'):
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
 
-    top_posts = r.get_subreddit('whiteknighttest').get_top(limit=10)
+    top_posts = r.get_subreddit(subreddit).get_new(limit=subnumber)
     comments_with_keywords = []
     f = open("swearWords.txt")
     keywords = []
