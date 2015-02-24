@@ -131,7 +131,7 @@ input[type=submit]{
 }
 
 /*********
-LOGIN
+FEED
 *********/
 
 #feed-button {
@@ -148,7 +148,7 @@ LOGIN
   text-shadow: 2px 2px 5px #444;
   background-color: #AAA;
   margin: auto;
-  margin-top: 50px;
+  margin-top: 25px;
   width: 40%;
   color: white;
   border-radius: 15px;
@@ -168,6 +168,10 @@ LOGIN
 #new-post-link {
   text-shadow: 2px 2px 5px #999;
   margin-top: 28px;
+}
+
+.scrape_fields {
+  float: right;
 }
 
 
