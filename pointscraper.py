@@ -24,8 +24,8 @@ def get_comments():
 
         for comment in comments:
             words = comment.body.lower()
-            response =  toolkit.text2sentiment(words.encode('utf-8'))
-            if response['score'] > -3:
+            response = toolkit.text2sentiment(words.encode('utf-8'))
+            if response['score'] < -2:
                 print comment.body
                 comments_with_keywords.append(comment)
             # for keyword in keywords.keys():
