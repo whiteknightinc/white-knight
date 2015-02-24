@@ -171,9 +171,12 @@ def _install_reqs():
 
 
 def deploy():
-    os.system('rsync -r  newstuff/* ubuntu@ec2-52-10-245-150.us-west-2.compute.amazonaws.com:~/')
+    select_instance()
+    print env.active_instance.public_dns_name
+    os.system('rsync -r /Users/roberthaskell/Projects/whiteknight/white-knight/ ubuntu@'+env.active_instance.public_dns_name+':~/')
     run_command_on_selected_server(_install_reqs)
     run_command_on_selected_server(_restart_nginx)
     # run_command_on_selected_server(_unlink_supervisor)
     # run_command_on_selected_server(_run_supervisor)
-    run_command_on_selected_server(_start_app)
+    # run_command_on_selected_server(_start_app)
+
