@@ -18,6 +18,7 @@
       <div class="subtitle">
         <h2 class="subunit"><a href="https://twitter.com/KnightShame">@KnightShame</a></h2>
         <h2 class="subunit"><a href="http://www.reddit.com/r/whiteknighttest/">/r/WhiteKnight</a></h2>
+        {% if request.authenticated_userid %}<h2 class="subunit" id="new-post-link"><a href="/feed">New Posts</a></h2>{% endif %}
       </div>
     </header>
     <main>

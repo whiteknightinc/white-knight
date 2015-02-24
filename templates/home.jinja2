@@ -1,7 +1,4 @@
 {% extends "base.jinja2" %}
 {% block body %}
   <h2 class="home-header">Welcome{% if request.authenticated_userid %} Admin{% endif %}!</h2>
-  <form action="/feed" id="feed-button">
-    <input type="submit" value="New Posts">
-  </form>
 {% endblock %}
