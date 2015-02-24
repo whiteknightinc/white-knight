@@ -47,18 +47,17 @@ class Comments(Base):
     permalink = sa.Column(sa.Unicode(127), nullable=False)
 
     @classmethod
-    def create(cls, comments, reddit):
-        for comment in comments:
-            text = comments[comment]['text']
-            username = comments[comment]['user']
-            permalink = comments[comment]['permalink']
-            reddit = reddit
-            new_entry = cls(text=text,
-                            username=username,
-                            reddit=reddit,
-                            permalink=permalink
-                            )
-            DBSession.add(new_entry)
+    def create(cls, comment, reddit):
+        text = comment['text']
+        username = comment['user']
+        permalink = comment['permalink']
+        reddit = reddit
+        new_entry = cls(text=text,
+                        username=username,
+                        reddit=reddit,
+                        permalink=permalink
+                        )
+        DBSession.add(new_entry)
         transaction.commit()
 
     @classmethod
@@ -68,7 +67,17 @@ class Comments(Base):
 
 def get_comments_from_reddit():
     comments = get_comments()
-    Comments.create(comments, reddit=True)
+    for comment in comments:
+        if not has_entry(comments[comment]['permalink']):
+            Comments.create(comments[comment], reddit=True)
+
+def has_entry(permalink):
+        # dictionary of permalinks
+        entries = Comments.all()
+        for entry in entries:
+            if entry.permalink == permalink:
+                return True
+        return False
 
 
 def get_entries():
