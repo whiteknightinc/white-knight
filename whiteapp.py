@@ -15,22 +15,54 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
+from sqlalchemy.ext.declarative import declarative_base
+from scraper import get_comments
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-
+Base = declarative_base()
 
 here = os.path.dirname(os.path.abspath(__file__))
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
+    get_comments_from_reddit()
+    print Comments.all()
     return {}
 
 
-def hello_world(request):
-    print('Incoming request')
-    return Response('<body><h1>Hello World! What?</h1></body>')
+class Comments(Base):
+    __tablename__ = 'comment'
+    id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    text = sa.Column(sa.UnicodeText, nullable=False)
+    username = sa.Column(sa.Unicode(127), nullable=False)
+    reddit = sa.Column(sa.Boolean, nullable=False)
+    permalink = sa.Column(sa.Unicode(127), nullable=False)
+
+    @classmethod
+    def create(cls, comments, reddit):
+        for comment in comments:
+            text = comments[comment]['text']
+            username = comments[comment]['user']
+            permalink = comments[comment]['permalink']
+            reddit = reddit
+            new_entry = cls(text=text, username=username, reddit=reddit, permalink=permalink)
+            DBSession.add(new_entry)
+
+    @classmethod
+    def all(cls):
+        return DBSession.query(cls).order_by(cls.id).all()
+
+
+def get_comments_from_reddit():
+    comments = get_comments()
+    Comments.create(comments, reddit=True)
+
+
+def get_entries():
+    entries = Comments.all()
+    return {'entries': entries}
 
 
 def main():
@@ -39,7 +71,7 @@ def main():
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://nbeck:@localhost:5432/learning_journal'
+        'DATABASE_URL', 'postgresql://roberthaskell:@localhost:5432/whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
