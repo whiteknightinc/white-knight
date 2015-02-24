@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -31,7 +31,6 @@ def home(request):
     return {}
 
 
-
 def read_one_comment():
     comments = Comments.all()
     print comments[0].text
@@ -40,7 +39,10 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
-    return {'comments': Comments.all()}
+    if request.authenticated_userid:
+        return {'comments': Comments.all()}
+    else:
+        return HTTPForbidden()
 
 
 class Comments(Base):
