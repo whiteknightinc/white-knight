@@ -31,7 +31,6 @@ def home(request):
     return {}
 
 
-
 def read_one_comment():
     comments = Comments.all()
     print comments[0].text
