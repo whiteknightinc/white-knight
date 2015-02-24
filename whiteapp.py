@@ -77,6 +77,7 @@ def get_comments_from_reddit():
         if not has_entry(comments[comment]['permalink']):
             Comments.create(comments[comment], reddit=True)
 
+
 def has_entry(permalink):
         # dictionary of permalinks
         entries = Comments.all()
