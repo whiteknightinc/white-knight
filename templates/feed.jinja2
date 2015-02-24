@@ -45,6 +45,7 @@
   </div>
   <div id="shame-feed">
   <form action="submit_form.asp">
+  <input type="submit" value="Submit" class="submit_button">
     {% for comment in comments %}
     <article class="shame-post">
             <h3 class="comment_title">{{ comment.username }}</h3>
@@ -56,8 +57,13 @@
           </a>
     </article>
     <br>
+    {% if not comment.reddit %}
+    <input type="checkbox" name="post" value="True"><h3 id='post_to_reddit'>Retweet?</h3>
+    {% else %}
     <input type="checkbox" name="post" value="True"><h3 id='post_to_reddit'>Post To Reddit?</h3>
+    {% endif %}
     {% endfor %}
+    <input type="submit" value="Submit" class="submit_button">
   </form>
   </div>
 {% endblock %}
