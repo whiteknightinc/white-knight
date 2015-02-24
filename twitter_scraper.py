@@ -1,6 +1,7 @@
 import tweepy
 import pdb
 
+
 def get_nasty_tweets():
     consumer_key = 'KSupNP0wNh1PfqdSt1qL2Fj6S'
     consumer_secret = 'cu2pRz6NhA7suKK4oncHOYeNbnriMk5t2E75AFJ22nxWE8Dj5w'
@@ -21,6 +22,7 @@ def get_nasty_tweets():
     tweets_with_keywords = []
 
     for tweet in tweets:
+        print tweet.text
         for keyword in keywords:
             if keyword in unicode(tweet.text).lower():
                 tweets_with_keywords.append(tweet)
@@ -54,4 +56,4 @@ def tweet_it_out():
 
 
 if __name__ == '__main__':
-    pass
+    get_keys()
