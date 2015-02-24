@@ -14,6 +14,7 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
+import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
 
@@ -27,6 +28,19 @@ here = os.path.dirname(os.path.abspath(__file__))
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
     get_comments_from_reddit()
+    read_one_comment()
+    return {'comments': Comments.all()}
+
+
+def read_one_comment():
+    comments = Comments.all()
+    print comments[0].text
+    return {'comments': Comments.all()}
+
+
+@view_config(route_name='feed', renderer='templates/feed.jinja2')
+def feed(request):
+    get_comments_from_reddit()
     return {'comments': Comments.all()}
 
 
@@ -39,18 +53,18 @@ class Comments(Base):
     permalink = sa.Column(sa.Unicode(127), nullable=False)
 
     @classmethod
-    def create(cls, comments, reddit):
-        for comment in comments:
-            text = comments[comment]['text']
-            username = comments[comment]['user']
-            permalink = comments[comment]['permalink']
-            reddit = reddit
-            new_entry = cls(text=text,
-                            username=username,
-                            reddit=reddit,
-                            permalink=permalink
-                            )
-            DBSession.add(new_entry)
+    def create(cls, comment, reddit):
+        text = comment['text']
+        username = comment['user']
+        permalink = comment['permalink']
+        reddit = reddit
+        new_entry = cls(text=text,
+                        username=username,
+                        reddit=reddit,
+                        permalink=permalink
+                        )
+        DBSession.add(new_entry)
+        transaction.commit()
 
     @classmethod
     def all(cls):
@@ -59,7 +73,18 @@ class Comments(Base):
 
 def get_comments_from_reddit():
     comments = get_comments()
-    Comments.create(comments, reddit=True)
+    for comment in comments:
+        if not has_entry(comments[comment]['permalink']):
+            Comments.create(comments[comment], reddit=True)
+
+
+def has_entry(permalink):
+        # dictionary of permalinks
+        entries = Comments.all()
+        for entry in entries:
+            if entry.permalink == permalink:
+                return True
+        return False
 
 
 def get_entries():
@@ -102,6 +127,7 @@ def main():
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('feed', '/feed')
     config.scan()
     app = config.make_wsgi_app()
     return app

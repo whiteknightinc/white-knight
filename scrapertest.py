@@ -11,20 +11,23 @@ def get_comments():
     for line in f:
         keywords.append(line.rstrip())
     f.close()
+    qComments = []
 
     for top_post in top_posts:
-        submission = r.get_submission(submission_id=top_post.id)
-        submission.replace_more_comments(limit=32, threshold=0)
-        all_comments = submission.comments
-        comments = praw.helpers.flatten_tree(all_comments)
+        try:
+            submission = r.get_submission(submission_id=top_post.id)
+            submission.replace_more_comments(limit=32, threshold=0)
+            all_comments = submission.comments
+            comments = praw.helpers.flatten_tree(all_comments)
 
-        for comment in comments:
-            words = comment.body.lower()
-            for keyword in keywords:
-                if keyword in words:
-                    comments_with_keywords.append(comment)
-                    break
-
+            for comment in comments:
+                words = comment.body.lower()
+                for keyword in keywords:
+                    if keyword in words:
+                        comments_with_keywords.append(comment)
+                        break
+        except(praw.errors.APIException()):
+            break
     result = {}
     for num in range(len(comments_with_keywords)):
         result[num] = {}
