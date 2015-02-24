@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPFound
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 import sqlalchemy as sa
@@ -92,11 +92,11 @@ def get_entries():
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
-    subnumber = request.params.get('sub_number', None)
-    try:
-        get_comments_from_reddit(subreddit, subnumber)
-    except:
-        return HTTPInternalServerError
+    subnumber = int(request.params.get('sub_number', None))
+    # try:
+    get_comments_from_reddit(subreddit, subnumber)
+    # except:
+    #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
 
 

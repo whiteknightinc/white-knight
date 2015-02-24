@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 {% extends "base.jinja2" %}
 {% block body %}
   <h2 class="home-header">Feed of Shame</h2>
@@ -5,14 +6,20 @@
   <form action="{{ request.route_url('scrape') }}" method="POST">
     <div class="field">
       <label for="subreddit">Subreddit: </label>
-      <input type="subreddit" name="subreddit" id="subreddit"/>
+      <input type="text" name="subreddit" id="subreddit"/>
     </div>
     <div class="field">
-      <label for="submission_number">Number of Threads: </label>
-      <input type="submission_number" name="submission_number"/>
+      <label for="sub_number">Number of Threads: </label>
+        <select name="sub_number" id="sub_number">
+          <option>1</option>
+          <option>2</option>
+          <option>3</option>
+          <option>4</option>
+          <option>5</option>
+        </select>
     </div>
     <div class="control_row">
-      <input type="submit" name="Submit" id="sub_number" value="Scrape!"/>
+      <input type="submit" name="Submit" value="Scrape!"/>
     </div>
   </form>
   <div id="shame-feed">
