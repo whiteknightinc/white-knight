@@ -1,6 +1,5 @@
 from pyramid.session import SignedCookieSessionFactory
 from pyramid.config import Configurator
-from pyramid.response import Response
 from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
@@ -28,8 +27,14 @@ here = os.path.dirname(os.path.abspath(__file__))
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
     get_comments_from_reddit()
-    print Comments.all()
-    return {}
+    read_one_comment()
+    return {'comments': Comments.all()}
+
+
+def read_one_comment():
+    comments = Comments.all()
+    print comments[0].text
+    return {'comments': Comments.all()}
 
 
 class Comments(Base):
@@ -47,7 +52,11 @@ class Comments(Base):
             username = comments[comment]['user']
             permalink = comments[comment]['permalink']
             reddit = reddit
-            new_entry = cls(text=text, username=username, reddit=reddit, permalink=permalink)
+            new_entry = cls(text=text,
+                            username=username,
+                            reddit=reddit,
+                            permalink=permalink
+                            )
             DBSession.add(new_entry)
 
     @classmethod
@@ -71,7 +80,7 @@ def main():
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://roberthaskell:@localhost:5432/whiteknight'
+        'DATABASE_URL', 'postgresql:///whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
