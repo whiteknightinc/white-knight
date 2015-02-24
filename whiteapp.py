@@ -92,11 +92,11 @@ def get_entries():
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
-    subnumber = request.params.get('sub_number', None)
-    try:
-        get_comments_from_reddit(subreddit, subnumber)
-    except:
-        return HTTPInternalServerError
+    subnumber = int(request.params.get('sub_number', None))
+    # try:
+    get_comments_from_reddit(subreddit, subnumber)
+    # except:
+    #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
 
 
@@ -106,7 +106,7 @@ def main():
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://nbeck:@localhost:5432/whiteknight'
+        'DATABASE_URL', 'postgresql://edward:@/whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
