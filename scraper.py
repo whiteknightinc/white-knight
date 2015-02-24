@@ -36,4 +36,6 @@ def get_comments():
     return result
 
 if __name__ == '__main__':
-    get_comments()
+    entries = get_comments()
+    for num in entries:
+        print entries[num]['permalink']

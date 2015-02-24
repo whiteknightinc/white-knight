@@ -22,14 +22,13 @@ class Comments(Base):
     permalink = sa.Column(sa.Unicode(127), nullable=False)
 
     @classmethod
-    def create(cls, comments, reddit):
-        for comment in comments:
-            text = comments[comment]['text']
-            username = comments[comment]['user']
-            permalink = comments[comment]['permalink']
-            reddit = reddit
-            new_entry = cls(text=text, username=username, reddit=reddit, permalink=permalink)
-            DBSession.add(new_entry)
+    def create(cls, comment, reddit):
+        text = comment['text']
+        username = comment['user']
+        permalink = comment['permalink']
+        reddit = reddit
+        new_entry = cls(text=text, username=username, reddit=reddit, permalink=permalink)
+        DBSession.add(new_entry)
 
     @classmethod
     def all(cls):
@@ -37,26 +36,30 @@ class Comments(Base):
 
 def get_comments_from_reddit():
     comments = get_comments()
-    Comments.create(comments, reddit=True)
+    for comment in comments:
+        if not has_entry(comments[comment]['permalink']):
+            Comments.create(comments[comment], reddit=True)
+
+def has_entry(permalink):
+        # dictionary of permalinks
+        entries = Comments.all()
+        for entry in entries:
+            if entry.permalink == permalink:
+                return True
+        return False
 
 def main():
     settings = {}
     settings['sqlalchemy.url'] = os.environ.get(
         ### FIX THE DB URL FORMAT, MUST BE rfc1738 URL
-        'DATABASE_URL', 'postgresql://roberthaskell:@/whiteknight'
+        'DATABASE_URL', 'postgresql://edward:@/whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     get_comments_from_reddit()
 
-def get_entries():
-    entries = Comments.all()
-    for entry in entries:
-        print entry.text
-
 if __name__ == '__main__':
     app = main()
-    get_entries()
 
 # from sqlalchemy import create_engine
 # engine = create_engine('postgresql://edward:@/whiteknight')
