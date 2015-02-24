@@ -72,7 +72,7 @@ class Comments(Base):
         return DBSession.query(cls).order_by(cls.id.desc()).all()
 
 
-def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
+def get_comments_from_reddit(subreddit='whiteknighttest', subnumber=1):
     comments = get_comments(subreddit, subnumber)
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
