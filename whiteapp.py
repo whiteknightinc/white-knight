@@ -99,6 +99,10 @@ def get_entries():
     entries = Comments.all()
     return {'entries': entries}
 
+@view_config(route_name='scrape_twitter', request_method='POST')
+def scrape_twitter(request):
+    get_tweets()
+    return HTTPFound(request.route_url('feed'))
 
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
@@ -151,6 +155,7 @@ def main():
     config.add_route('logout', '/logout')
     config.add_route('feed', '/feed')
     config.add_route('scrape', '/scrape')
+    config.add_route('scrape_twitter', '/scrape_twitter')
     config.scan()
     app = config.make_wsgi_app()
     return app

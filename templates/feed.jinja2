@@ -24,7 +24,7 @@
     </form>
   </div>
   <div class="tweet_scrape">
-    <form action="{{ request.route_url('scrape') }}" method="POST">
+    <form action="{{ request.route_url('scrape_twitter') }}" method="POST">
       <div class="field">
         <label for="twitter_handle">Twitter Handle: </label>
         <input type="text" name="handle" id="handle"/>
