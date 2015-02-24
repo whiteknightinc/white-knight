@@ -9,11 +9,36 @@ def tweep():
 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
-
     api = tweepy.API(auth)
+    tweets = api.home_timeline(count=10)
 
-    tweep = api.home_timeline(count=3)
+    f = open("swearWords.txt")
+    keywords = []
+    for line in f:
+        keywords.append(line.rstrip())
+    f.close()
 
+    tweets_with_keywords = []
+
+    for tweet in tweets:
+        text = tweet.text
+        for keyword in keywords:
+            if keyword in text:
+                tweets_with_keywords.append(tweet)
+                break
+
+    shitty_tweets = {}
+    for i in range(len(tweets_with_keywords)):
+        user = tweets[i].user.name
+        ident = tweets[i].id
+        permalink = "www.twitter.com/"+user+"/status/"+str(ident)
+        text = tweets[i].text
+        shitty_tweets[i] = {
+            'text': text,
+            'user': user,
+            'permalink': permalink
+            }
+    return shitty_tweets
 
 if __name__ == '__main__':
-    tweep()
+    print tweep()
