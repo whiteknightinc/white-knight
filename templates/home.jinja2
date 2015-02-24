@@ -1,20 +1,7 @@
 {% extends "base.jinja2" %}
 {% block body %}
-  <h2 class="home-header">Recently Shamed</h2>
-  <div id="front-shame">
-    {% for comment in comments %}
-    <article class="shame-post">
-            <h3>{{ comment.user }}</h3>
-            <div class="post">
-              <div class="comment_body" id ="detail_post">
-                {{ comment.text }}
-              </div>
-            </div>
-          </a>
-    </article>
-    {% else %}
-    <div class="entry">
-      <p><em>No shameful posts yet</em></p>
-    </div>
-    {% endfor %}
+  <h2 class="home-header">Welcome{% if request.authenticated_userid %} Admin{% endif %}!</h2>
+  <form action="/feed" id="feed-button">
+    <input type="submit" value="New Posts">
+  </form>
 {% endblock %}

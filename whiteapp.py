@@ -30,6 +30,12 @@ def home(request):
     return {'comments': Comments.all()}
 
 
+@view_config(route_name='feed', renderer='templates/feed.jinja2')
+def feed(request):
+    get_comments_from_reddit()
+    return {'comments': Comments.all()}
+
+
 class Comments(Base):
     __tablename__ = 'comment'
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
@@ -102,6 +108,7 @@ def main():
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
+    config.add_route('feed', '/feed')
     config.scan()
     app = config.make_wsgi_app()
     return app

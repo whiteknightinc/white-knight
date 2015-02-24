@@ -1,0 +1,21 @@
+{% extends "base.jinja2" %}
+{% block body %}
+  <h2 class="home-header">Feed of Shame</h2>
+  <div id="shame-feed">
+    {% for comment in comments %}
+    <article class="shame-post">
+            <h3 class="comment_title">{{ comment.username }}</h3>
+            <div class="post">
+              <div class="comment_body" id ="detail_post">
+                {{ comment.text }}
+              </div>
+            </div>
+          </a>
+    </article>
+    {% else %}
+    <div class="entry">
+      <p><em>No shameful posts yet</em></p>
+    </div>
+    {% endfor %}
+  </div>
+{% endblock %}
