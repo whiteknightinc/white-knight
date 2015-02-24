@@ -27,8 +27,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
     get_comments_from_reddit()
-    print Comments.all()
-    return {}
+    return {'comments': Comments.all()}
 
 
 class Comments(Base):
