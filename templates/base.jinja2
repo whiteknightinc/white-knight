@@ -4,6 +4,8 @@
     <title>White Knight</title>
     <link href='http://fonts.googleapis.com/css?family=Lobster|Courgette|Roboto+Condensed:300italic,700,300,400' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../static/style.css">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script type="text/javascript" src="../static/script.js"></script>
   </head>
   <body>
     <header>
@@ -14,11 +16,13 @@
         <a href="{{ request.route_url('logout') }}">Log out</a>
         {% endif %}
       </div>
+      <div class="admin-login" id="new-posts">
+      {% if request.authenticated_userid %}<a href="/feed">New Posts</a>{% endif %}
+      </div>
       <a href="/" id="logo"><h1><center>Because People Are Terrible</center></h1></a>
       <div class="subtitle">
         <h2 class="subunit"><a href="https://twitter.com/KnightShame">@KnightShame</a></h2>
         <h2 class="subunit"><a href="http://www.reddit.com/r/whiteknighttest/">/r/WhiteKnight</a></h2>
-        {% if request.authenticated_userid %}<h2 class="subunit" id="new-post-link"><a href="/feed">New Posts</a></h2>{% endif %}
       </div>
     </header>
     <main>

@@ -1,0 +1,15 @@
+{% extends "base.jinja2" %}
+{% block body %}
+ <h2 class="home-header">Editor</h2>
+  <div class="shame-feed" id="edit_feed">
+    {% for entry in entries %}
+    <form action="{{ request.route_url('tweet', id = entry.id) }}" method="POST">
+        <label for="title"><h3 id="edit_title">{{ entry.username }}'s Terrible Post: </h3></label><br>
+        <div class="field">
+                <textarea name="text" id="text" rows="5" cols="80">{{ entry.username }} is a jerk: {{ entry.permalink }}</textarea>
+        </div>
+        <input type="submit" name="Submit" value="Tweet"/>
+    </form>
+    {% endfor %}
+{% endblock %}
+

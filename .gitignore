@@ -6,6 +6,7 @@ __pycache__/
 *.so
 
 .DS_Store
+twitterkeys.txt
 # Distribution / packaging
 .Python
 env/

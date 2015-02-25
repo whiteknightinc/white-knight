@@ -4,9 +4,10 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPInternalServerError
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
+from tweepy import TweepError
 import sqlalchemy as sa
 import os
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -18,6 +19,7 @@ import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
 from twitter_scraper import get_nasty_tweets
+from twitter_scraper import tweet_it_out
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -28,8 +30,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
-    return {}
-
+    return {'comments': Comments.home()}
 
 
 def read_one_comment():
@@ -40,7 +41,10 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
-    return {'comments': Comments.all()}
+    if request.authenticated_userid:
+        return {'comments': Comments.all()}
+    else:
+        return HTTPForbidden()
 
 
 class Comments(Base):
@@ -50,6 +54,7 @@ class Comments(Base):
     username = sa.Column(sa.Unicode(127), nullable=False)
     reddit = sa.Column(sa.Boolean, nullable=False)
     permalink = sa.Column(sa.Unicode(127), nullable=False)
+    approved = sa.Column(sa.Boolean, nullable=False)
 
     @classmethod
     def create(cls, comment, reddit):
@@ -60,7 +65,8 @@ class Comments(Base):
         new_entry = cls(text=text,
                         username=username,
                         reddit=reddit,
-                        permalink=permalink
+                        permalink=permalink,
+                        approved=False
                         )
         DBSession.add(new_entry)
         transaction.commit()
@@ -69,8 +75,30 @@ class Comments(Base):
     def all(cls):
         return DBSession.query(cls).order_by(cls.id.desc()).all()
 
+    @classmethod
+    def home(cls):
+        return DBSession.query(cls).filter(cls.approved).order_by(cls.id.desc()).limit(5)
 
-def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
+    @classmethod
+    def by_id(cls, id):
+        return DBSession.query(cls).filter(cls.id == id).one()
+
+    @classmethod
+    def delete_by_id(cls, id):
+        comment = DBSession.query(cls).filter(cls.id == id).one()
+        print "getting here"
+        DBSession.delete(comment)
+        print 'getting past delete'
+        # transaction.commit()
+
+    @classmethod
+    def approve_comment(cls, id):
+        comment = DBSession.query(cls).filter(cls.id == id).one()
+        comment.approved = True
+        transaction.commit()
+
+
+def get_comments_from_reddit(subreddit, subnumber):
     comments = get_comments(subreddit, subnumber)
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
@@ -78,10 +106,13 @@ def get_comments_from_reddit(subreddit='whiteknighttest', subnumber='1'):
 
 
 def get_tweets():
-    tweets = get_nasty_tweets()
-    for tweet in tweets:
-        if not has_entry(tweets[tweet]['permalink']):
-            Comments.create(tweets[tweet], reddit=False)
+    try:
+        tweets = get_nasty_tweets()
+        for tweet in tweets:
+            if not has_entry(tweets[tweet]['permalink']):
+                Comments.create(tweets[tweet], reddit=False)
+    except TweepError:
+        return {}
 
 
 def has_entry(permalink):
@@ -93,20 +124,64 @@ def has_entry(permalink):
         return False
 
 
+# def remove_entry(id):
+#     id = comment.id
+#     entry = Comments.query.get(id)
+#     DBSession.
+
+
 def get_entries():
     entries = Comments.all()
     return {'entries': entries}
 
 
+@view_config(route_name='scrape_twitter', request_method='POST')
+def scrape_twitter(request):
+    get_tweets()
+    return HTTPFound(request.route_url('feed'))
+
+
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
+    if subreddit == "":
+        subreddit = 'whiteknighttest'
     subnumber = int(request.params.get('sub_number', None))
     # try:
     get_comments_from_reddit(subreddit, subnumber)
     # except:
     #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
+
+
+@view_config(route_name="tweet")
+def tweet_comment(request):
+    tweet_it_out(request.params.get('text', "ignore this tweet"))
+    Comments.approve_comment(request.matchdict.get('id', -1))
+    return HTTPFound(request.route_url('feed'))
+
+
+@view_config(route_name='edit_comment', renderer='templates/editcomment.jinja2')
+def edit(request):
+    entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
+    if request.method == 'POST':
+        edit = entry['entries'][0]
+        edit.title = request.params['title']
+        edit.text = request.params['text']
+        # update(request, request.matchdict.get('id', -1))
+    return entry
+
+
+@view_config(route_name='delete_all')
+def delete(request):
+    comments = Comments.all()
+    for comment in comments:
+        print comment.id
+        if not comment.approved:
+            Comments.delete_by_id(comment.id)
+    transaction.commit()
+    return HTTPFound(request.route_url('feed'))
+
 
 
 def main():
@@ -146,6 +221,10 @@ def main():
     config.add_route('logout', '/logout')
     config.add_route('feed', '/feed')
     config.add_route('scrape', '/scrape')
+    config.add_route('scrape_twitter', '/scrape_twitter')
+    config.add_route('tweet', '/tweet/{id}')
+    config.add_route('edit_comment', '/edit_comment/{id}')
+    config.add_route('delete_all', '/delete_all')
     config.scan()
     app = config.make_wsgi_app()
     return app

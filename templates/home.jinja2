@@ -1,4 +1,21 @@
 {% extends "base.jinja2" %}
 {% block body %}
   <h2 class="home-header">Welcome{% if request.authenticated_userid %} Admin{% endif %}!</h2>
+  <h3 id="recent_header">Recent Tweets</h3>
+  <div class="home_feed">
+    {% for comment in comments %}
+    {% if comment.approved %}
+    <article class="recent_shame">
+            <h3 class="comment_title">{{ comment.username }}</h3>
+            <div class="post">
+              <div class="comment_body" id ="detail_post">
+                {{ comment.text }}
+              </div>
+            </div>
+          </a>
+    </article>
+    {% endif %}
+    {% endfor %}
+  </div>
+  <br>
 {% endblock %}

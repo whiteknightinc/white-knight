@@ -54,7 +54,7 @@ def main():
     settings = {}
     settings['sqlalchemy.url'] = os.environ.get(
         ### FIX THE DB URL FORMAT, MUST BE rfc1738 URL
-        'DATABASE_URL', 'postgresql://edward:@/whiteknight'
+        'DATABASE_URL', 'postgresql:///whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
