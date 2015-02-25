@@ -1,5 +1,3 @@
-twitterkeys.txt
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -8,6 +6,7 @@ __pycache__/
 *.so
 
 .DS_Store
+twitterkeys.txt
 # Distribution / packaging
 .Python
 env/

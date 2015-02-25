@@ -22,12 +22,15 @@ def get_comments(subreddit, subnumber):
 
         for comment in comments:
             score = 0
-            words = comment.body.lower()
-            for keyword in keywords.keys():
-                count = words.count(keyword)
-                length = len(words) / 6
-                if count > 0:
-                    score += count * (keywords.get(keyword))
+            comment_body = comment.body.lower()
+            words = comment_body.split(' ')
+            length = len(comment_body) / 4
+            for word in words:
+                word = word.rstrip('.')
+                word = word.strip('"')
+                word = word.rstrip('?')
+                if word in keywords:
+                    score += keywords.get(word)
                     if score >= 10 or score >= length:
                         comments_with_keywords.append(comment)
                         break
@@ -41,6 +44,6 @@ def get_comments(subreddit, subnumber):
     return result
 
 if __name__ == '__main__':
-    entries = get_comments('whiteknighttest', 1)
+    entries = get_comments('whiteknighttest', 5)
     for num in entries:
         print entries[num]['text']
