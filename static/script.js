@@ -7,4 +7,22 @@ $(document).ready( function() {
             return false;
         };
     }
+
+    function hide_post() {
+        alert("hiding");
+        $('.twitter').addClass( 'remove_feed' );
+        $('.shame-post').hide();
+    }
+
+    alert("Ready");
+
+    $('.edit_button').click(function(event){
+    hide_post();
+  });
+
+
+    $('.twitter-share-button').click(function(event){
+    hide_post();
+  });
+
 })
