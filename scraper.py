@@ -27,7 +27,7 @@ def get_comments(subreddit, subnumber):
             length = len(comment_body) / 4
             for word in words:
                 word = word.rstrip('.')
-                word  = word.strip('"')
+                word = word.strip('"')
                 word = word.rstrip('?')
                 if word in keywords:
                     score += keywords.get(word)

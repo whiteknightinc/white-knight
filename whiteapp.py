@@ -28,25 +28,6 @@ Base = declarative_base()
 here = os.path.dirname(os.path.abspath(__file__))
 
 
-@view_config(route_name='home', renderer='templates/home.jinja2')
-def home(request):
-    return {'comments': Comments.home()}
-
-
-def read_one_comment():
-    comments = Comments.all()
-    print comments[0].text
-    return {'comments': Comments.all()}
-
-
-@view_config(route_name='feed', renderer='templates/feed.jinja2')
-def feed(request):
-    if request.authenticated_userid:
-        return {'comments': Comments.all()}
-    else:
-        return HTTPForbidden()
-
-
 class Comments(Base):
     __tablename__ = 'comment'
     id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
@@ -98,41 +79,20 @@ class Comments(Base):
         transaction.commit()
 
 
-def get_comments_from_reddit(subreddit, subnumber):
-    comments = get_comments(subreddit, subnumber)
-    for comment in comments:
-        if not has_entry(comments[comment]['permalink']):
-            Comments.create(comments[comment], reddit=True)
+"""view_configs"""
 
 
-def get_tweets():
-    try:
-        tweets = get_nasty_tweets()
-        for tweet in tweets:
-            if not has_entry(tweets[tweet]['permalink']):
-                Comments.create(tweets[tweet], reddit=False)
-    except TweepError:
-        return {}
+@view_config(route_name='home', renderer='templates/home.jinja2')
+def home(request):
+    return {'comments': Comments.home()}
 
 
-def has_entry(permalink):
-        # dictionary of permalinks
-        entries = Comments.all()
-        for entry in entries:
-            if entry.permalink == permalink:
-                return True
-        return False
-
-
-# def remove_entry(id):
-#     id = comment.id
-#     entry = Comments.query.get(id)
-#     DBSession.
-
-
-def get_entries():
-    entries = Comments.all()
-    return {'entries': entries}
+@view_config(route_name='feed', renderer='templates/feed.jinja2')
+def feed(request):
+    if request.authenticated_userid:
+        return {'comments': Comments.all()}
+    else:
+        return HTTPForbidden()
 
 
 @view_config(route_name='scrape_twitter', request_method='POST')
@@ -147,10 +107,7 @@ def scrape_reddit(request):
     if subreddit == "":
         subreddit = 'whiteknighttest'
     subnumber = int(request.params.get('sub_number', None))
-    # try:
     get_comments_from_reddit(subreddit, subnumber)
-    # except:
-    #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
 
 
@@ -168,7 +125,6 @@ def edit(request):
         edit = entry['entries'][0]
         edit.title = request.params['title']
         edit.text = request.params['text']
-        # update(request, request.matchdict.get('id', -1))
     return entry
 
 
@@ -181,66 +137,6 @@ def delete(request):
             Comments.delete_by_id(comment.id)
     transaction.commit()
     return HTTPFound(request.route_url('feed'))
-
-
-
-def main():
-    """Create a configured wsgi app"""
-    settings = {}
-    settings['reload_all'] = os.environ.get('DEBUG', True)
-    settings['debug_all'] = os.environ.get('DEBUG', True)
-    settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql:///whiteknight'
-    )
-    engine = sa.engine_from_config(settings, 'sqlalchemy.')
-    DBSession.configure(bind=engine)
-    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
-    manager = BCRYPTPasswordManager()
-    settings['auth.password'] = os.environ.get(
-        'AUTH_PASSWORD', manager.encode('secret')
-    )
-    secret = os.environ.get('JOURNAL_SESSION_SECRET', 'itsaseekrit')
-    session_factory = SignedCookieSessionFactory(secret)
-    # add a secret value for auth tkt signing
-    auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'anotherseekrit')
-    # configuration setup
-    config = Configurator(
-        settings=settings,
-        session_factory=session_factory,
-        authentication_policy=AuthTktAuthenticationPolicy(
-            secret=auth_secret,
-            hashalg='sha512',
-            debug=True
-        ),
-        authorization_policy=ACLAuthorizationPolicy(),
-    )
-    config.add_static_view('static', os.path.join(here, 'static'))
-    config.include('pyramid_jinja2')
-    config.add_route('home', '/')
-    config.add_route('login', '/login')
-    config.add_route('logout', '/logout')
-    config.add_route('feed', '/feed')
-    config.add_route('scrape', '/scrape')
-    config.add_route('scrape_twitter', '/scrape_twitter')
-    config.add_route('tweet', '/tweet/{id}')
-    config.add_route('edit_comment', '/edit_comment/{id}')
-    config.add_route('delete_all', '/delete_all')
-    config.scan()
-    app = config.make_wsgi_app()
-    return app
-
-
-def do_login(request):
-    username = request.params.get('username', None)
-    password = request.params.get('password', None)
-    if not (username and password):
-        raise ValueError('both username and password are required')
-
-    settings = request.registry.settings
-    manager = BCRYPTPasswordManager()
-    if username == settings.get('auth.username', ''):
-        hashed = settings.get('auth.password', '')
-        return manager.check(hashed, password)
 
 
 @view_config(route_name='login', renderer="templates/login.jinja2")
@@ -268,7 +164,97 @@ def logout(request):
     headers = forget(request)
     return HTTPFound(request.route_url('home'), headers=headers)
 
+
+"""helper methods"""
+
+
+def get_comments_from_reddit(subreddit, subnumber):
+    comments = get_comments(subreddit, subnumber)
+    for comment in comments:
+        if not has_entry(comments[comment]['permalink']):
+            Comments.create(comments[comment], reddit=True)
+
+
+def get_tweets():
+    try:
+        tweets = get_nasty_tweets()
+        for tweet in tweets:
+            if not has_entry(tweets[tweet]['permalink']):
+                Comments.create(tweets[tweet], reddit=False)
+    except TweepError:
+        return {}
+
+
+def has_entry(permalink):
+        entries = Comments.all()
+        for entry in entries:
+            if entry.permalink == permalink:
+                return True
+        return False
+
+
+def get_entries():
+    entries = Comments.all()
+    return {'entries': entries}
+
+
+def do_login(request):
+    username = request.params.get('username', None)
+    password = request.params.get('password', None)
+    if not (username and password):
+        raise ValueError('both username and password are required')
+
+    settings = request.registry.settings
+    manager = BCRYPTPasswordManager()
+    if username == settings.get('auth.username', ''):
+        hashed = settings.get('auth.password', '')
+        return manager.check(hashed, password)
+
+
+def main():
+    """Create a configured wsgi app"""
+    settings = {}
+    settings['reload_all'] = os.environ.get('DEBUG', True)
+    settings['debug_all'] = os.environ.get('DEBUG', True)
+    settings['sqlalchemy.url'] = os.environ.get(
+        'DATABASE_URL', 'postgresql:///whiteknight'
+    )
+    engine = sa.engine_from_config(settings, 'sqlalchemy.')
+    DBSession.configure(bind=engine)
+    settings['auth.username'] = os.environ.get('AUTH_USERNAME', 'admin')
+    manager = BCRYPTPasswordManager()
+    settings['auth.password'] = os.environ.get(
+        'AUTH_PASSWORD', manager.encode('secret')
+    )
+    secret = os.environ.get('JOURNAL_SESSION_SECRET', 'itsaseekrit')
+    session_factory = SignedCookieSessionFactory(secret)
+    auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'anotherseekrit')
+    config = Configurator(
+        settings=settings,
+        session_factory=session_factory,
+        authentication_policy=AuthTktAuthenticationPolicy(
+            secret=auth_secret,
+            hashalg='sha512',
+            debug=True
+        ),
+        authorization_policy=ACLAuthorizationPolicy(),
+    )
+    config.add_static_view('static', os.path.join(here, 'static'))
+    config.include('pyramid_jinja2')
+    config.add_route('home', '/')
+    config.add_route('login', '/login')
+    config.add_route('logout', '/logout')
+    config.add_route('feed', '/feed')
+    config.add_route('scrape', '/scrape')
+    config.add_route('scrape_twitter', '/scrape_twitter')
+    config.add_route('tweet', '/tweet/{id}')
+    config.add_route('edit_comment', '/edit_comment/{id}')
+    config.add_route('delete_all', '/delete_all')
+    config.scan()
+    app = config.make_wsgi_app()
+    return app
+
+
 if __name__ == '__main__':
-    # config.add_view(hello_world, route_name='hello')
     main = main()
     serve(main, host='0.0.0.0', port=8080)
