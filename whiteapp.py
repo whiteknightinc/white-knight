@@ -89,6 +89,7 @@ class Comments(Base):
     def approve_comment(cls, id):
         comment = DBSession.query(cls).filter(cls.id == id).one()
         comment.approved = True
+        transaction.commit()
 
 
 def get_comments_from_reddit(subreddit, subnumber):
