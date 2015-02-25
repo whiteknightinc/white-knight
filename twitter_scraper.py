@@ -33,10 +33,6 @@ def get_nasty_tweets():
     tweets_with_keywords = []
 
     for tweet in tweets:
-        print tweet.text
-        for keyword in keywords:
-            if keyword in unicode(tweet.text).lower():
-                tweets_with_keywords.append(tweet)
             score = 0
             comment_body = tweet.text.lower()
             words = comment_body.split(' ')
