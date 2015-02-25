@@ -7,6 +7,7 @@ from pyramid.security import remember, forget
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
+from tweepy import TweepError
 import sqlalchemy as sa
 import os
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -80,10 +81,13 @@ def get_comments_from_reddit(subreddit, subnumber):
 
 
 def get_tweets():
-    tweets = get_nasty_tweets()
-    for tweet in tweets:
-        if not has_entry(tweets[tweet]['permalink']):
-            Comments.create(tweets[tweet], reddit=False)
+    try:
+        tweets = get_nasty_tweets()
+        for tweet in tweets:
+            if not has_entry(tweets[tweet]['permalink']):
+                Comments.create(tweets[tweet], reddit=False)
+    except TweepError:
+        return {}
 
 
 def has_entry(permalink):
@@ -93,6 +97,12 @@ def has_entry(permalink):
             if entry.permalink == permalink:
                 return True
         return False
+
+
+# def remove_entry(id):
+#     id = comment.id
+#     entry = Comments.query.get(id)
+#     DBSession.
 
 
 def get_entries():
