@@ -43,7 +43,7 @@ piss,1
 poop,1
 prick,2
 pube,2
-pussy,3
+pussy,5
 queer,2
 rape,10
 scrotum,3
@@ -51,7 +51,7 @@ sex,1
 shit,2
 sh1t,2
 slut,5
-smegma,5
+smegma,10
 spunk,4
 tit,2
 tosser,1
