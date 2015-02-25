@@ -25,8 +25,6 @@ def get_comments(subreddit, subnumber):
             comment_body = comment.body.lower()
             words = comment_body.split(' ')
             length = len(comment_body) / 4
-            print comment_body
-            print length
             for word in words:
                 word = word.rstrip('.')
                 if word in keywords:
