@@ -30,7 +30,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
-    return {}
+    return {'comments': Comments.home()}
 
 
 def read_one_comment():
@@ -74,6 +74,10 @@ class Comments(Base):
     @classmethod
     def all(cls):
         return DBSession.query(cls).order_by(cls.id.desc()).all()
+
+    @classmethod
+    def home(cls):
+        return DBSession.query(cls).filter(cls.approved).order_by(cls.id.desc()).limit(5)
 
     @classmethod
     def by_id(cls, id):
