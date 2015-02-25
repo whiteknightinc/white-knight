@@ -1,7 +1,7 @@
 {% extends "base.jinja2" %}
 {% block body %}
   <h2 class="home-header">Welcome{% if request.authenticated_userid %} Admin{% endif %}!</h2>
-  <h3 id="recent_header">Recently Posted by Horrible People</h3>
+  <h3 id="recent_header">Recently Posted by Miserable People</h3>
   <div class="home_feed">
     {% for comment in comments %}
     {% if comment.approved %}

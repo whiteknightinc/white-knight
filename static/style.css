@@ -68,6 +68,12 @@ text-decoration: none;
   margin-left: 10px;
 }
 
+.mission {
+  margin-top: -70px;
+  font-weight: 300;
+  font-style: italic;
+}
+
 /*********
 RECENT
 *********/
