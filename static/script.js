@@ -9,12 +9,9 @@ $(document).ready( function() {
     }
 
     function hide_post() {
-        alert("hiding");
         $('.twitter').addClass( 'remove_feed' );
         $('.shame-post').hide();
     }
-
-    alert("Ready");
 
     $('.edit_button').click(function(event){
     hide_post();
