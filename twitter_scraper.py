@@ -58,7 +58,7 @@ def get_nasty_tweets():
     return shitty_tweets
 
 
-def tweet_it_out():
+def tweet_it_out(stat):
 
     keys = load_keys()
 
@@ -67,7 +67,7 @@ def tweet_it_out():
     api = tweepy.API(auth)
 
     # twitter won't let you tweet out duplicates
-    api.update_status(status="test tweet")
+    api.update_status(status=stat)
 
 
 if __name__ == '__main__':

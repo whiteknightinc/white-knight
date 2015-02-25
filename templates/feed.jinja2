@@ -55,18 +55,32 @@
           </a>
     </article>
     <br>
+    <a href="{{ request.route_url('edit_comment', id = comment.id)}}"><button>edit comment</button></a>
     {% if not comment.reddit %}
     <div style="text-align:center" class="twitter">
     <a href="https://twitter.com/share" class="twitter-share-button" data-text="Here's a shitty post by {{ comment.username }}:
 {{comment.permalink }}" data-via="KnightShame" data-size="large" data-dnt="true" data-url="{{ comment.permalink }}" data-hashtags="shittyposts">Tweet</a>
-    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    <script>!function(d,s,id){
+      var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+      if(!d.getElementById(id)){
+        js=d.createElement(s);
+        js.id=id;
+        js.src=p+'://platform.twitter.com/widgets.js';
+        fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+      </script>
     </div>
     {% else %}
     <a href="{{ comment.permalink }}"><h3 id='post_to_reddit'>Tweet Reddit Post?</h3>
     <div style="text-align:center" class="twitter">
     <a href="https://twitter.com/share" class="twitter-share-button" data-text="Here's a shitty post by {{ comment.username }}:
 {{comment.permalink }}" data-via="KnightShame" data-size="large" data-dnt="true" data-url="{{ comment.permalink }}" data-hashtags="shittyposts">Tweet</a>
-    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    <script>!function(d,s,id){
+      var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
+      if(!d.getElementById(id)){
+        js=d.createElement(s);
+        js.id=id;js.src=p+'://platform.twitter.com/widgets.js';
+        fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+      </script>
     </div>
     {% endif %}
     {% endfor %}
