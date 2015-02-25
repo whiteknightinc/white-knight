@@ -86,8 +86,10 @@ class Comments(Base):
     @classmethod
     def delete_by_id(cls, id):
         comment = DBSession.query(cls).filter(cls.id == id).one()
+        print "getting here"
         DBSession.delete(comment)
-        transaction.commit()
+        print 'getting past delete'
+        # transaction.commit()
 
     @classmethod
     def approve_comment(cls, id):
@@ -170,6 +172,18 @@ def edit(request):
     return entry
 
 
+@view_config(route_name='delete_all')
+def delete(request):
+    comments = Comments.all()
+    for comment in comments:
+        print comment.id
+        if not comment.approved:
+            Comments.delete_by_id(comment.id)
+    transaction.commit()
+    return HTTPFound(request.route_url('feed'))
+
+
+
 def main():
     """Create a configured wsgi app"""
     settings = {}
@@ -210,6 +224,7 @@ def main():
     config.add_route('scrape_twitter', '/scrape_twitter')
     config.add_route('tweet', '/tweet/{id}')
     config.add_route('edit_comment', '/edit_comment/{id}')
+    config.add_route('delete_all', '/delete_all')
     config.scan()
     app = config.make_wsgi_app()
     return app
