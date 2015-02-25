@@ -7,6 +7,7 @@ from pyramid.security import remember, forget
 from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
+from tweepy import TweepError
 import sqlalchemy as sa
 import os
 from zope.sqlalchemy import ZopeTransactionExtension
@@ -18,6 +19,7 @@ import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
 from twitter_scraper import get_nasty_tweets
+from twitter_scraper import tweet_it_out
 
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
@@ -71,6 +73,10 @@ class Comments(Base):
     def all(cls):
         return DBSession.query(cls).order_by(cls.id.desc()).all()
 
+    @classmethod
+    def by_id(cls, id):
+        return DBSession.query(cls).filter(cls.id == id).one()
+
 
 def get_comments_from_reddit(subreddit, subnumber):
     comments = get_comments(subreddit, subnumber)
@@ -80,10 +86,13 @@ def get_comments_from_reddit(subreddit, subnumber):
 
 
 def get_tweets():
-    tweets = get_nasty_tweets()
-    for tweet in tweets:
-        if not has_entry(tweets[tweet]['permalink']):
-            Comments.create(tweets[tweet], reddit=False)
+    try:
+        tweets = get_nasty_tweets()
+        for tweet in tweets:
+            if not has_entry(tweets[tweet]['permalink']):
+                Comments.create(tweets[tweet], reddit=False)
+    except TweepError:
+        return {}
 
 
 def has_entry(permalink):
@@ -93,6 +102,12 @@ def has_entry(permalink):
             if entry.permalink == permalink:
                 return True
         return False
+
+
+# def remove_entry(id):
+#     id = comment.id
+#     entry = Comments.query.get(id)
+#     DBSession.
 
 
 def get_entries():
@@ -117,6 +132,25 @@ def scrape_reddit(request):
     # except:
     #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
+
+
+@view_config(route_name="tweet")
+def tweet_comment(request):
+    print request.params.get('text', None)
+    tweet_it_out(request.params.get('text', "ignore this tweet"))
+    return HTTPFound(request.route_url('feed'))
+
+
+@view_config(route_name='edit_comment', renderer='templates/editcomment.jinja2')
+def edit(request):
+    print request.matchdict.get('id', -1)
+    entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
+    if request.method == 'POST':
+        edit = entry['entries'][0]
+        edit.title = request.params['title']
+        edit.text = request.params['text']
+        # update(request, request.matchdict.get('id', -1))
+    return entry
 
 
 def main():
@@ -157,6 +191,8 @@ def main():
     config.add_route('feed', '/feed')
     config.add_route('scrape', '/scrape')
     config.add_route('scrape_twitter', '/scrape_twitter')
+    config.add_route('tweet', '/tweet/{id}')
+    config.add_route('edit_comment', '/edit_comment/{id}')
     config.scan()
     app = config.make_wsgi_app()
     return app

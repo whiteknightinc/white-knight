@@ -180,7 +180,7 @@ FEED
   float: right;
   margin-right: 25px;
   position: fixed;
-  bottom: 75px;
+  bottom: 360px;
   right: 15px;
 }
 
@@ -193,7 +193,7 @@ FEED
   float: left;
   margin-left: 25px;
   position: fixed;
-  bottom: 75px;
+  bottom: 360px;
   left: 15px;
 }
 
