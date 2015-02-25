@@ -70,6 +70,9 @@ homos,5
 jizz,5
 jizzed,5
 jizzing,5
+kill,5
+killing,5
+killed,5
 labia,2
 labias,2
 muff,3
