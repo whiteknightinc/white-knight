@@ -53,10 +53,10 @@ def get_nasty_tweets():
 
     shitty_tweets = {}
     for i in range(len(tweets_with_keywords)):
-        user = tweets[i].user.name
-        ident = tweets[i].id
+        user = tweets_with_keywords[i].user.name
+        ident = tweets_with_keywords[i].id
         permalink = "www.twitter.com/" + user + "/status/" + str(ident)
-        text = tweets[i].text
+        text = tweets_with_keywords[i].text
         shitty_tweets[i] = {
             'text': text,
             'user': user,
