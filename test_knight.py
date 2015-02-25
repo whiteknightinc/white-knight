@@ -2,11 +2,23 @@ import pytest
 import psycopg2
 from contextlib import closing
 from pyramid import testing
+import sqlalchemy as sa
+import os
+from zope.sqlalchemy import ZopeTransactionExtension
+from sqlalchemy.orm import (
+    scoped_session,
+    sessionmaker,
+)
+from sqlalchemy.ext.declarative import declarative_base
 
 TEST_DSN = 'dbname=test user=edward'
+AL_TEST_DSN = 'postgresql://edward:@/test'
+
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+Base = declarative_base()
 
 DB_SCHEMA = """
-CREATE TABLE IF NOT EXISTS entries (
+CREATE TABLE IF NOT EXISTS comment (
     id serial PRIMARY KEY,
     text TEXT NOT NULL,
     username VARCHAR (127) NOT NULL,
@@ -18,30 +30,44 @@ CREATE TABLE IF NOT EXISTS entries (
 
 @pytest.fixture(scope='session')
 def db(request):
-    """set up and tear down a database"""
+    """set up test database"""
     settings = {'db': TEST_DSN}
-    init_db(settings)
+    with closing(connect_db(settings)) as db:
+        db.cursor().execute(DB_SCHEMA)
+        db.commit()
 
     def cleanup():
-        clear_db(settings)
+        with closing(connect_db(settings)) as db:
+            db.cursor().execute("DROP TABLE comment")
+            db.commit()
 
     request.addfinalizer(cleanup)
 
     return settings
 
-def init_db(settings):
-    with closing(connect_db(settings)) as db:
-        db.cursor().execute(DB_SCHEMA)
-        db.commit()
+# def init_db(settings):
+#     import pdb; pdb.set_trace()
+#     with closing(connect_db(settings)) as db:
+#         db.cursor().execute(DB_SCHEMA)
+#         db.commit()
 
-def clear_db(settings):
-    with closing(connect_db(settings)) as db:
-        db.cursor().execute("DROP TABLE entries")
-        db.commit()
+# def clear_db(settings):
+#     with closing(connect_db(settings)) as db:
+#         db.cursor().execute("DROP TABLE entries")
+#         db.commit()
 
 def connect_db(settings):
     """Return a connection to the configured database"""
     return psycopg2.connect(settings['db'])
+
+@pytest.fixture(scope='function')
+def app(db):
+    from whiteapp import main
+    from webtest import TestApp
+    import os
+    os.environ['DATABASE_URL'] = AL_TEST_DSN
+    app = main()
+    return TestApp(app)
 
 @pytest.yield_fixture(scope='function')
 def req_context(db, request):
@@ -71,18 +97,26 @@ def test_reddit_scraper():
         if comments[num]['text'] == 'Shit':
             assert comments[num]['text'] == 'Shit'
 
-def test_scrape_reddit(req_context):
-    from whiteapp import scrape_reddit
-    fields = ('subreddit', 'sub_number')
-    values = ('whiteknighttest', 7)
-    req_context.params = dict(zip(fields, values))
-
+def test_scrape_reddit(app):
     # assert that there are no entries when we start
-    rows = run_query(req_context.db, "SELECT * FROM entries")
+    rows = run_query(req_context.db, "SELECT * FROM comment")
     assert len(rows) == 0
 
     # add comments from whiteknighttest to database
-    scrape_reddit(req_context)
+    entry_data = {
+        'subreddit': 'whiteknighttest',
+        'sub_number': 7,
+    }
+    response = app.post('/scrape', params=entry_data, status='3*')
+    redirected = response.follow()
+    actual = redirected.body
+    for expected in entry_data.values():
+        assert expected in actual
+    # settings = {}
+    # settings['sqlalchemy.url'] = AL_TEST_DSN
+    # engine = sa.engine_from_config(settings, 'sqlalchemy.')
+    # DBSession.configure(bind=engine)
+    response = scrape_reddit(req_context)
 
-    rows = run_query(req_context.db, "SELECT username, text, permalink FROM entries")
+    rows = run_query(req_context.db, "SELECT username, text, permalink FROM comment")
     assert len(rows) == 1
