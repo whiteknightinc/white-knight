@@ -67,4 +67,4 @@ def tweet_it_out():
 
 
 if __name__ == '__main__':
-    print get_nasty_tweets()
+    pass
