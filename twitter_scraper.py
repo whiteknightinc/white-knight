@@ -33,23 +33,19 @@ def get_nasty_tweets(handle, tweet_number):
     tweets_with_keywords = []
 
     for tweet in tweets:
-        print tweet.text
-        for keyword in keywords:
-            if keyword in unicode(tweet.text).lower():
-                tweets_with_keywords.append(tweet)
-            score = 0
-            comment_body = tweet.text.lower()
-            words = comment_body.split(' ')
-            length = len(comment_body) / 4
-            for word in words:
-                word = word.rstrip('.')
-                word = word.strip('"')
-                word = word.rstrip('?')
-                if word in keywords:
-                    score += keywords.get(word)
-                    if score >= 10 or score >= length:
-                        tweets_with_keywords.append(tweet)
-                        break
+        score = 0
+        comment_body = tweet.text.lower()
+        words = comment_body.split(' ')
+        length = len(comment_body) / 4
+        for word in words:
+            word = word.rstrip('.')
+            word = word.strip('"')
+            word = word.rstrip('?')
+            if word in keywords:
+                score += keywords.get(word)
+                if score >= 10 or score >= length:
+                    tweets_with_keywords.append(tweet)
+                    break
 
     shitty_tweets = {}
     for i in range(len(tweets_with_keywords)):
@@ -76,6 +72,18 @@ def tweet_it_out(stat):
     # twitter won't let you tweet out duplicates
     api.update_status(status=stat)
 
+def make_nasty_tweet(tweet, number):
+    user = tweet.user.name
+    ident = tweet.id
+    permalink = "www.twitter.com/" + user + "/status/" + str(ident)
+    dicttweet = {
+        number: {
+            'text': tweet.text,
+            'user': user,
+            'permalink': permalink
+        }
+    }
+    return dicttweet
 
 if __name__ == '__main__':
     print get_nasty_tweets()
