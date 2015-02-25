@@ -1,5 +1,4 @@
 import tweepy
-import pdb
 
 
 def load_keys():
@@ -33,7 +32,6 @@ def get_nasty_tweets(handle, tweet_number):
     tweets_with_keywords = []
 
     for tweet in tweets:
-        print tweet.text
         for keyword in keywords:
             if keyword in unicode(tweet.text).lower():
                 tweets_with_keywords.append(tweet)
