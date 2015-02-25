@@ -33,6 +33,10 @@ def get_nasty_tweets():
     tweets_with_keywords = []
 
     for tweet in tweets:
+        print tweet.text
+        for keyword in keywords:
+            if keyword in unicode(tweet.text).lower():
+                tweets_with_keywords.append(tweet)
             score = 0
             words = tweet.text.lower()
             for keyword in keywords.keys():
@@ -71,4 +75,4 @@ def tweet_it_out(stat):
 
 
 if __name__ == '__main__':
-    pass
+    print get_nasty_tweets()
