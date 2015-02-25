@@ -14,14 +14,14 @@ def load_keys():
     return keydict
 
 
-def get_nasty_tweets():
+def get_nasty_tweets(handle, tweet_number):
 
     keys = load_keys()
 
     auth = tweepy.OAuthHandler(keys['consumer_key'], keys['consumer_secret'])
     auth.set_access_token(keys['access_token'], keys['access_token_secret'])
     api = tweepy.API(auth)
-    tweets = api.home_timeline(count=25)
+    tweets = api.user_timeline(handle, count=tweet_number)
 
     f = open("swearWordsValue.txt")
     keywords = {}

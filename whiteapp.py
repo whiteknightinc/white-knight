@@ -105,9 +105,9 @@ def get_comments_from_reddit(subreddit, subnumber):
             Comments.create(comments[comment], reddit=True)
 
 
-def get_tweets():
+def get_tweets(handle, tweet_number):
     try:
-        tweets = get_nasty_tweets()
+        tweets = get_nasty_tweets(handle, tweet_number)
         for tweet in tweets:
             if not has_entry(tweets[tweet]['permalink']):
                 Comments.create(tweets[tweet], reddit=False)
@@ -137,7 +137,11 @@ def get_entries():
 
 @view_config(route_name='scrape_twitter', request_method='POST')
 def scrape_twitter(request):
-    get_tweets()
+    handle = request.params.get('handle', None)
+    if handle == "":
+        handle = 'DouserBot'
+    tweet_number = int(request.params.get('tweet_number', None))
+    get_tweets(handle, tweet_number)
     return HTTPFound(request.route_url('feed'))
 
 
@@ -190,7 +194,7 @@ def main():
     settings['reload_all'] = os.environ.get('DEBUG', True)
     settings['debug_all'] = os.environ.get('DEBUG', True)
     settings['sqlalchemy.url'] = os.environ.get(
-        'DATABASE_URL', 'postgresql://whiteknight'
+        'DATABASE_URL', 'postgresql:///whiteknight'
     )
     engine = sa.engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
