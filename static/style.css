@@ -31,7 +31,6 @@ font-weight: 300;
 margin-top: -50px;
 }
 
-
 a {
 color: white;
 text-decoration: none;
@@ -138,7 +137,7 @@ FEED
   text-align: center;
 }
 
-#shame-feed {
+.shame-feed {
   text-align: center;
   margin-left: 31px;
 }
@@ -205,9 +204,11 @@ FEED
   text-shadow: 1.5px 1.5px 2px #ccc;
 }
 
-.submit_button {
-  margin-right: 25px;
-  margin-bottom: 25px;
+.edit_button {
+  font-family: 'Roboto Condensed';
+  box-shadow: 2px 2px 10px rgba(0,0,0,.3);
+  background-color: #eee;
+  border-radius: 5px;
 }
 
 .twitter {
@@ -215,6 +216,14 @@ FEED
   margin-left: 50px;
 }
 
+#edit_feed {
+  margin-right: 30px;
+}
 
+.remove_feed {
+  visibility: hidden;
+}
 
-
+.approved {
+  visibility: hidden;
+}
