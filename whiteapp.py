@@ -34,8 +34,6 @@ def home(request):
 
 
 def read_one_comment():
-    comments = Comments.all()
-    print comments[0].text
     return {'comments': Comments.all()}
 
 
@@ -86,9 +84,7 @@ class Comments(Base):
     @classmethod
     def delete_by_id(cls, id):
         comment = DBSession.query(cls).filter(cls.id == id).one()
-        print "getting here"
         DBSession.delete(comment)
-        print 'getting past delete'
         # transaction.commit()
 
     @classmethod
@@ -176,12 +172,10 @@ def edit(request):
 def delete(request):
     comments = Comments.all()
     for comment in comments:
-        print comment.id
         if not comment.approved:
             Comments.delete_by_id(comment.id)
     transaction.commit()
     return HTTPFound(request.route_url('feed'))
-
 
 
 def main():
