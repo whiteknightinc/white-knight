@@ -54,6 +54,7 @@ class Comments(Base):
     username = sa.Column(sa.Unicode(127), nullable=False)
     reddit = sa.Column(sa.Boolean, nullable=False)
     permalink = sa.Column(sa.Unicode(127), nullable=False)
+    approved = sa.Column(sa.Boolean, nullable=False)
 
     @classmethod
     def create(cls, comment, reddit):
@@ -64,7 +65,8 @@ class Comments(Base):
         new_entry = cls(text=text,
                         username=username,
                         reddit=reddit,
-                        permalink=permalink
+                        permalink=permalink,
+                        approved=False
                         )
         DBSession.add(new_entry)
         transaction.commit()
@@ -76,6 +78,17 @@ class Comments(Base):
     @classmethod
     def by_id(cls, id):
         return DBSession.query(cls).filter(cls.id == id).one()
+
+    @classmethod
+    def delete_by_id(cls, id):
+        comment = DBSession.query(cls).filter(cls.id == id).one()
+        DBSession.delete(comment)
+        transaction.commit()
+
+    @classmethod
+    def approve_comment(cls, id):
+        comment = DBSession.query(cls).filter(cls.id == id).one()
+        comment.approved = True
 
 
 def get_comments_from_reddit(subreddit, subnumber):
@@ -136,14 +149,13 @@ def scrape_reddit(request):
 
 @view_config(route_name="tweet")
 def tweet_comment(request):
-    print request.params.get('text', None)
     tweet_it_out(request.params.get('text', "ignore this tweet"))
+    Comments.approve_comment(request.matchdict.get('id', -1))
     return HTTPFound(request.route_url('feed'))
 
 
 @view_config(route_name='edit_comment', renderer='templates/editcomment.jinja2')
 def edit(request):
-    print request.matchdict.get('id', -1)
     entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
     if request.method == 'POST':
         edit = entry['entries'][0]
