@@ -88,15 +88,12 @@ poops,1
 pooped,1
 prick,2
 pube,2
-<<<<<<< HEAD
 pussy,5
 queer,2
-=======
 pubes,2
 pussy,3
 pussies,3
 pussys,3
->>>>>>> b0bd3b9b01837d8703e8d542fe3dabd5879c5c74
 rape,10
 rapes,10
 raping,10
@@ -112,12 +109,8 @@ sh1t,3
 sh1tty,3
 sh1tting,3
 slut,5
-<<<<<<< HEAD
-smegma,10
-=======
 sluts,5
-smegma,5
->>>>>>> b0bd3b9b01837d8703e8d542fe3dabd5879c5c74
+smegma,10
 spunk,4
 spunked,4
 tit,2
@@ -132,12 +125,9 @@ vagina,2
 vaginas,2
 vaginal,2
 wank,3
-<<<<<<< HEAD
-whore,5
-=======
 wanks,3
+whore,5
 wanker,3
 whore,5
 whores,5
 whoring,5
->>>>>>> b0bd3b9b01837d8703e8d542fe3dabd5879c5c74
