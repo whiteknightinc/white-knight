@@ -24,8 +24,11 @@ def get_comments(subreddit, subnumber):
             score = 0
             comment_body = comment.body.lower()
             words = comment_body.split(' ')
-            length = len(words) / 6
+            length = len(comment_body) / 4
+            print comment_body
+            print length
             for word in words:
+                word = word.rstrip('.')
                 if word in keywords:
                     score += keywords.get(word)
                     if score >= 10 or score >= length:
