@@ -3,7 +3,7 @@ import psycopg2
 from contextlib import closing
 from pyramid import testing
 
-TEST_DSN = 'dbname=test user=edward'
+TEST_DSN = 'dbname=test user=roberthaskell'
 
 DB_SCHEMA = """
 CREATE TABLE IF NOT EXISTS entries (
