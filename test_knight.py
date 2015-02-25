@@ -10,6 +10,7 @@ from sqlalchemy.orm import (
     sessionmaker,
 )
 from sqlalchemy.ext.declarative import declarative_base
+from cryptacular.bcrypt import BCRYPTPasswordManager
 
 TEST_DSN = 'dbname=test user=edward'
 AL_TEST_DSN = 'postgresql://edward:@/test'
@@ -27,6 +28,11 @@ CREATE TABLE IF NOT EXISTS comment (
     approved BOOLEAN NOT NULL
 )
 """
+
+@pytest.fixture(scope='session')
+def authorize():
+    login_data = {'username': 'admin', 'password': 'secret'}
+    return app.post('/login', params=login_data, status='*')
 
 @pytest.fixture(scope='session')
 def db(request):
@@ -88,6 +94,28 @@ def run_query(db, query, params=(), get_results=True):
         results = cursor.fetchall()
     return results
 
+@pytest.fixture(scope='function')
+def auth_req(request):
+    manager = BCRYPTPasswordManager()
+    settings = {
+        'auth.username': 'admin',
+        'auth.password': manager.encode('secret'),
+    }
+    testing.setUp(settings=settings)
+    req = testing.DummyRequest()
+
+    def cleanup():
+        testing.tearDown()
+
+    request.addfinalizer(cleanup)
+
+    return req
+
+def test_do_login_success(auth_req):
+    from whiteapp import do_login
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    assert do_login(auth_req)
+
 comments ={}
 
 def test_reddit_scraper():
@@ -97,7 +125,8 @@ def test_reddit_scraper():
         if comments[num]['text'] == 'Shit':
             assert comments[num]['text'] == 'Shit'
 
-def test_scrape_reddit(app):
+def test_scrape_reddit(req_context, app, auth_req):
+    from whiteapp import feed
     # assert that there are no entries when we start
     rows = run_query(req_context.db, "SELECT * FROM comment")
     assert len(rows) == 0
@@ -107,4 +136,8 @@ def test_scrape_reddit(app):
         'subreddit': 'whiteknighttest',
         'sub_number': 7,
     }
-    response = app.post('/scrape', params=entry_data, status='3*')
+    app.post('/scrape', params=entry_data, status='3*')
+    auth_req.params = {'username': 'admin', 'password': 'secret'}
+    db_comments = feed(auth_req)
+    for num in comments:
+        assert comments[num] in db_comments
