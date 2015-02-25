@@ -23,20 +23,26 @@ def get_nasty_tweets():
     api = tweepy.API(auth)
     tweets = api.home_timeline(count=25)
 
-
-    f = open("swearWords.txt")
-    keywords = []
+    f = open("swearWordsValue.txt")
+    keywords = {}
     for line in f:
-        keywords.append(line.rstrip())
+        word, val = line.rstrip().split(",")
+        keywords[word] = int(val)
     f.close()
 
     tweets_with_keywords = []
 
     for tweet in tweets:
-        print tweet.text
-        for keyword in keywords:
-            if keyword in unicode(tweet.text).lower():
-                tweets_with_keywords.append(tweet)
+            score = 0
+            words = tweet.text.lower()
+            for keyword in keywords.keys():
+                count = words.count(keyword)
+                length = len(words) / 6
+                if count > 0:
+                    score += count * (keywords.get(keyword))
+                    if score >= 10 or score >= length:
+                        tweets_with_keywords.append(tweet)
+                        break
 
     shitty_tweets = {}
     for i in range(len(tweets_with_keywords)):

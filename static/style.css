@@ -140,6 +140,7 @@ FEED
 
 #shame-feed {
   text-align: center;
+  margin-left: 31px;
 }
 
 .shame-post {
@@ -178,6 +179,9 @@ FEED
   box-shadow: 2px 2px 10px rgba(0,0,0,.7);
   float: right;
   margin-right: 25px;
+  position: fixed;
+  bottom: 360px;
+  right: 15px;
 }
 
 .tweet_scrape {
@@ -188,9 +192,13 @@ FEED
   box-shadow: 2px 2px 10px rgba(0,0,0,.7);
   float: left;
   margin-left: 25px;
+  position: fixed;
+  bottom: 360px;
+  left: 15px;
 }
 
 #post_to_reddit {
+  margin-top: 12px;
   font-family: 'Courgette', sans-serif;
   font-size: 1.5em;
   color: #777;
@@ -202,6 +210,10 @@ FEED
   margin-bottom: 25px;
 }
 
+.twitter {
+  margin-top: 12px;
+  margin-left: 50px;
+}
 
 
 

@@ -32,7 +32,7 @@
       <div class="field">
         <label for="tweet_number">Number of Tweets: </label>
           <select name="tweet_number" id="tweet_number">
-            <option>25</option>
+            <option>5</option>
             <option>50</option>
             <option>75</option>
             <option>100</option>
@@ -44,8 +44,6 @@
     </form>
   </div>
   <div id="shame-feed">
-  <form action="submit_form.asp">
-  <input type="submit" value="Submit" class="submit_button">
     {% for comment in comments %}
     <article class="shame-post">
             <h3 class="comment_title">{{ comment.username }}</h3>
@@ -58,12 +56,19 @@
     </article>
     <br>
     {% if not comment.reddit %}
-    <input type="checkbox" name="post" value="True"><h3 id='post_to_reddit'>Retweet?</h3>
+    <div style="text-align:center" class="twitter">
+    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Here's a shitty post by {{ comment.username }}:
+{{comment.permalink }}" data-via="KnightShame" data-size="large" data-dnt="true" data-url="{{ comment.permalink }}" data-hashtags="shittyposts">Tweet</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    </div>
     {% else %}
-    <input type="checkbox" name="post" value="True"><h3 id='post_to_reddit'>Post To Reddit?</h3>
+    <a href="{{ comment.permalink }}"><h3 id='post_to_reddit'>Tweet Reddit Post?</h3>
+    <div style="text-align:center" class="twitter">
+    <a href="https://twitter.com/share" class="twitter-share-button" data-text="Here's a shitty post by {{ comment.username }}:
+{{comment.permalink }}" data-via="KnightShame" data-size="large" data-dnt="true" data-url="{{ comment.permalink }}" data-hashtags="shittyposts">Tweet</a>
+    <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+    </div>
     {% endif %}
     {% endfor %}
-    <input type="submit" value="Submit" class="submit_button">
-  </form>
   </div>
 {% endblock %}
