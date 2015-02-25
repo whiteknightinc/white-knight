@@ -27,7 +27,7 @@ def get_comments(subreddit, subnumber):
             length = len(comment_body) / 4
             for word in words:
                 word = word.rstrip('.')
-                word = word.strip('"')
+                word  = word.strip('"')
                 word = word.rstrip('?')
                 if word in keywords:
                     score += keywords.get(word)
@@ -42,6 +42,12 @@ def get_comments(subreddit, subnumber):
         result[num]['user'] = comments_with_keywords[num].author.name
         result[num]['permalink'] = comments_with_keywords[num].permalink
     return result
+
+
+def post_to_reddit(post):
+    r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
+                    'Url: https://github.com/whiteknightinc/white-knight')
+    r.login(username='whiteknightinc', password='whiteknight123')
 
 if __name__ == '__main__':
     entries = get_comments('whiteknighttest', 5)

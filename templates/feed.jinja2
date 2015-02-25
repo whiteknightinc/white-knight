@@ -44,6 +44,7 @@
     </form>
   </div>
   <div class="shame-feed">
+   <a href="{{ request.route_url('delete_all') }}"><button class="clear_comments">Clear Comments</button></a>
     {% for comment in comments %}
     {% if not comment.approved %}
     <article class="shame-post">

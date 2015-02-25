@@ -108,15 +108,3 @@ def test_scrape_reddit(app):
         'sub_number': 7,
     }
     response = app.post('/scrape', params=entry_data, status='3*')
-    redirected = response.follow()
-    actual = redirected.body
-    for expected in entry_data.values():
-        assert expected in actual
-    # settings = {}
-    # settings['sqlalchemy.url'] = AL_TEST_DSN
-    # engine = sa.engine_from_config(settings, 'sqlalchemy.')
-    # DBSession.configure(bind=engine)
-    response = scrape_reddit(req_context)
-
-    rows = run_query(req_context.db, "SELECT username, text, permalink FROM comment")
-    assert len(rows) == 1
