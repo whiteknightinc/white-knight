@@ -99,10 +99,12 @@ def get_entries():
     entries = Comments.all()
     return {'entries': entries}
 
+
 @view_config(route_name='scrape_twitter', request_method='POST')
 def scrape_twitter(request):
     get_tweets()
     return HTTPFound(request.route_url('feed'))
+
 
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
