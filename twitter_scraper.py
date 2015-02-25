@@ -38,12 +38,15 @@ def get_nasty_tweets():
             if keyword in unicode(tweet.text).lower():
                 tweets_with_keywords.append(tweet)
             score = 0
-            words = tweet.text.lower()
-            for keyword in keywords.keys():
-                count = words.count(keyword)
-                length = len(words) / 6
-                if count > 0:
-                    score += count * (keywords.get(keyword))
+            comment_body = tweet.text.lower()
+            words = comment_body.split(' ')
+            length = len(comment_body) / 4
+            for word in words:
+                word = word.rstrip('.')
+                word = word.strip('"')
+                word = word.rstrip('?')
+                if word in keywords:
+                    score += keywords.get(word)
                     if score >= 10 or score >= length:
                         tweets_with_keywords.append(tweet)
                         break

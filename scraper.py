@@ -43,6 +43,12 @@ def get_comments(subreddit, subnumber):
         result[num]['permalink'] = comments_with_keywords[num].permalink
     return result
 
+
+def post_to_reddit(post):
+    r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
+                    'Url: https://github.com/whiteknightinc/white-knight')
+    r.login(username='whiteknightinc', password='whiteknight123')
+
 if __name__ == '__main__':
     entries = get_comments('whiteknighttest', 5)
     for num in entries:
