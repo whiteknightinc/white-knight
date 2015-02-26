@@ -1,16 +1,23 @@
 import praw
 
 
-def get_comments(subreddit='all', subnumber=500):
-    r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
+def method():
+    return 3
+
+
+def from_reddit(subreddit, subnumber):
+        r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
-
-    # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    result = {}
-
-    try:
         submission = r.get_subreddit(subreddit)
         comments = r.get_comments(submission, limit=subnumber)
+        return comments
+
+
+def get_comments(subreddit='all', subnumber=500):
+    # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
+    result = {}
+    try:
+        comments = from_reddit(subreddit, subnumber)
     except praw.errors.APIException:
         raise praw.errors.APIException("reddit's broke")
     f = open("swearWordsValue.txt")

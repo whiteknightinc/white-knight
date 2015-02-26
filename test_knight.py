@@ -12,10 +12,16 @@ from sqlalchemy.orm import (
 from sqlalchemy.ext.declarative import declarative_base
 from cryptacular.bcrypt import BCRYPTPasswordManager
 import mock
+import scraper
 
 
-TEST_DSN = 'dbname=test user=edward'
-AL_TEST_DSN = 'postgresql://edward:@/test'
+def test_t_scraper():
+    test_scraper = scraper
+    com = test_scraper.from_reddit('whiteknighttest', 100)
+    print type(com)
+
+TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
+AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
@@ -127,11 +133,7 @@ def test_reddit_scraper():
     for num in comments:
         if comments[num]['text'] == 'Shit':
             assert comments[num]['text'] == 'Shit'
-    mock_function = create_autospec(get_comments, return_value='praw.errors.APIException')
-    try:
-        mock_function(get_comments(params), 'error')
-    except error:
-        assert 
+
 
 def test_scrape_reddit(req_context, app, auth_req):
     from whiteapp import feed
