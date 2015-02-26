@@ -4,6 +4,7 @@ from contextlib import closing
 from pyramid import testing
 from whiteapp import Comments
 
+
 def test_add_Comments():
 
     new_comment = {
