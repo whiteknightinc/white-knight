@@ -4,6 +4,11 @@ from praw.errors import RedirectException
 
 
 def get_comments(subreddit='all', subnumber=500):
+    """
+    Get most recent [subnumber] comments from the specified subreddit.
+    Return a dictionary of comments. Each comment is its own dictionary
+    with username, text, and permalink.
+    """
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
 
@@ -19,11 +24,6 @@ def get_comments(subreddit='all', subnumber=500):
         keywords[word] = int(val)
     f.close()
 
-    # for top_post in top_posts:
-    #     submission = r.get_submission(submission_id=top_post.id)
-    #     submission.replace_more_comments(limit=32, threshold=0)
-    #     all_comments = submission.comments
-    #     comments = praw.helpers.flatten_tree(all_comments)
     index = 0
     count = 0
     try:
@@ -49,16 +49,13 @@ def get_comments(subreddit='all', subnumber=500):
     except RedirectException:
         return {}
 
-    # result = {}
-    # for num in range(len(comments_with_keywords)):
-    #     result[num] = {}
-    #     result[num]['text'] = comments_with_keywords[num].body
-    #     result[num]['user'] = comments_with_keywords[num].author.name
-    #     result[num]['permalink'] = comments_with_keywords[num].permalink
     return result
 
 
 def make_nasty_comment(comment):
+    """
+    Turn a comment into a dictionary with its username, body, and permalink.
+    """
     user = comment.author.name
     permalink = comment.permalink
     dictcomment = {
@@ -67,12 +64,6 @@ def make_nasty_comment(comment):
         'permalink': permalink
     }
     return dictcomment
-
-
-def post_to_reddit(post):
-    r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
-                    'Url: https://github.com/whiteknightinc/white-knight')
-    r.login(username='whiteknightinc', password='whiteknight123')
 
 if __name__ == '__main__':
     entries = get_comments('whiteknighttest', 5)
