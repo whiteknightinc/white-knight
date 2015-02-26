@@ -111,9 +111,9 @@ def get_comments_from_reddit(subreddit, subnumber):
 
 
 def get_tweets(handle, tweet_number):
+    global source_name
     try:
         tweets = get_nasty_tweets(handle, tweet_number)
-        global source_name
         if handle == "":
             source_name = "DouserBot's feed"
         else:
@@ -124,6 +124,7 @@ def get_tweets(handle, tweet_number):
             if not has_entry(tweets[tweet]['permalink']):
                 Comments.create(tweets[tweet], reddit=False)
     except TweepError:
+        source_name = handle
         return {}
 
 
