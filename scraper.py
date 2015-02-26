@@ -6,8 +6,8 @@ def get_comments(subreddit, subnumber):
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    submission = r.get_subreddit('askreddit')
-    comments = r.get_comments(submission, limit=1000)
+    submission = r.get_subreddit(subreddit)
+    comments = r.get_comments(submission, limit=subnumber)
     comments_with_keywords = []
     f = open("swearWordsValue.txt")
     keywords = {}
