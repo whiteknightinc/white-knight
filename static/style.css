@@ -56,16 +56,30 @@ text-decoration: none;
     margin: auto;
     margin-bottom: 5px;
     text-align: center;
+    color: #444;
 }
 
 .subtitle {
-  margin-top: -30px;
+  margin-top: 10px;
   font-size: 1em;
 }
 
 #new-posts {
   float: left;
   margin-left: 10px;
+}
+
+.mission {
+  margin-top: -70px;
+  font-weight: 300;
+  font-style: italic;
+  color: #444;
+}
+
+.twitter_handle {
+  margin-top: -70px;
+  font-weight: 300;
+  color: #444;
 }
 
 /*********
@@ -94,8 +108,12 @@ RECENT
   text-align: center;
   font-family: 'Lobster', sans-serif;
   margin-top: -30px;
+<<<<<<< HEAD
   color: #fff;
   text-shadow: 1px 1px 15px #555;
+=======
+  color: #444;
+>>>>>>> master
   font-size: 2em;
 }
 

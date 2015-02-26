@@ -1,5 +1,4 @@
 import tweepy
-import pdb
 
 
 def load_keys():
@@ -30,38 +29,36 @@ def get_nasty_tweets(handle, tweet_number):
         keywords[word] = int(val)
     f.close()
 
-    tweets_with_keywords = []
-
-    for tweet in tweets:
-        print tweet.text
-        for keyword in keywords:
-            if keyword in unicode(tweet.text).lower():
-                tweets_with_keywords.append(tweet)
-            score = 0
-            comment_body = tweet.text.lower()
-            words = comment_body.split(' ')
-            length = len(comment_body) / 4
-            for word in words:
-                word = word.rstrip('.')
-                word = word.strip('"')
-                word = word.rstrip('?')
-                if word in keywords:
-                    score += keywords.get(word)
-                    if score >= 10 or score >= length:
-                        tweets_with_keywords.append(tweet)
-                        break
-
+    # tweets_with_keywords = []
     shitty_tweets = {}
-    for i in range(len(tweets_with_keywords)):
-        user = tweets_with_keywords[i].user.name
-        ident = tweets_with_keywords[i].id
-        permalink = "www.twitter.com/" + user + "/status/" + str(ident)
-        text = tweets_with_keywords[i].text
-        shitty_tweets[i] = {
-            'text': text,
-            'user': user,
-            'permalink': permalink
-        }
+    count = 0
+    for tweet in tweets:
+        score = 0
+        comment_body = tweet.text.lower()
+        words = comment_body.split(' ')
+        length = len(comment_body) / 4
+        for word in words:
+            word = word.rstrip('.')
+            word = word.strip('"')
+            word = word.rstrip('?')
+            if word in keywords:
+                score += keywords.get(word)
+                if score >= 10 or score >= length:
+                    # tweets_with_keywords.append(tweet)
+                    shitty_tweets[count] = make_nasty_tweet(tweet)
+                    count += 1
+                    break
+
+    # for i in range(len(tweets_with_keywords)):
+    #     user = tweets_with_keywords[i].user.name
+    #     ident = tweets_with_keywords[i].id
+    #     permalink = "www.twitter.com/" + user + "/status/" + str(ident)
+    #     text = tweets_with_keywords[i].text
+    #     shitty_tweets[i] = {
+    #         'text': text,
+    #         'user': user,
+    #         'permalink': permalink
+    #     }
     return shitty_tweets
 
 
@@ -76,6 +73,17 @@ def tweet_it_out(stat):
     # twitter won't let you tweet out duplicates
     api.update_status(status=stat)
 
+
+def make_nasty_tweet(tweet):
+    user = tweet.user.name
+    ident = tweet.id
+    permalink = "www.twitter.com/" + user + "/status/" + str(ident)
+    dicttweet = {
+            'text': tweet.text,
+            'user': user,
+            'permalink': permalink
+            }
+    return dicttweet
 
 if __name__ == '__main__':
     print get_nasty_tweets()
