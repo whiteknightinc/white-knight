@@ -5,15 +5,28 @@
   <h2 class="home-header">Feed of Shame</h2>
   </div>
   <div class="mobile">
-    <form action="{{ request.route_url('scrape') }}" method="POST">
-      <div class="field">
-        <label for="subreddit">Subreddit: </label>
-        <input type="text" name="subreddit" id="subreddit"/>
-      </div>
-      <div class="control_row">
-        <input type="submit" name="Submit" value="Scrape!" id="scrape_button"/>
-      </div>
-    </form>
+    <div id="mobile_reddit">
+      <form action="{{ request.route_url('scrape') }}" method="POST">
+        <div class="field">
+          <label for="subreddit">Subreddit: </label>
+          <input type="text" name="subreddit" id="subreddit"/>
+        </div>
+        <div class="control_row">
+          <input type="submit" name="Submit" value="Scrape Reddit!" id="scrape_button"/>
+        </div>
+      </form>
+    </div>
+    <div id="mobile_twitter">
+      <form action="{{ request.route_url('scrape_twitter') }}" method="POST">
+        <div class="field">
+          <label for="twitter_handle">Twitter Handle: </label>
+          <input type="text" name="handle" id="handle"/>
+        </div>
+        <div class="control_row">
+          <input type="submit" name="Submit" value="Scrape Twitter!"/>
+        </div>
+      </form>
+    </div>
   </div>
   <div class="reddit_scrape">
     <form action="{{ request.route_url('scrape') }}" method="POST">
@@ -45,7 +58,7 @@
       <div class="field">
         <label for="tweet_number">Number of Tweets: </label>
           <select name="tweet_number" id="tweet_number">
-            <option>5</option>
+            <option>25</option>
             <option>50</option>
             <option>75</option>
             <option>100</option>

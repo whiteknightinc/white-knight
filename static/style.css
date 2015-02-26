@@ -299,6 +299,20 @@ FEED
   border-radius: 5px;
 }
 
+#mobile_reddit {
+  display: inline-block;
+  margin-right: 50px;
+}
+
+#mobile_twitter {
+  display: inline-block;
+}
+
+.mobile {
+  margin-left: 20px;
+}
+
+
 /*********
 EDIT
 *********/
@@ -317,7 +331,7 @@ EDIT
 VIEWS
 *********/
 
-@media (max-width: 480px) {
+@media (max-width: 540px) {
   .mission {
     visibility: hidden;
   }
@@ -341,6 +355,19 @@ VIEWS
   .shame-post {
     width: 80%
   }
+
+  #mobile_reddit {
+    margin-right: 22px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  #mobile_twitter {
+    margin-top: 30px;
+    margin-right: 22px;
+    margin-bottom: 50px;
+  }
+
 }
 
 @media (min-width: 481px) and (max-width: 800px) {
@@ -355,7 +382,7 @@ VIEWS
 
 
 @media (max-width: 1000px) {
-    .tweet_scrape {
+  .tweet_scrape {
     visibility: hidden;
   }
 
@@ -363,7 +390,8 @@ VIEWS
     visibility: hidden;
   }
 
-    .mobile {
+  .mobile {
+    text-align: center;
     margin-bottom: 20px;
   }
 
