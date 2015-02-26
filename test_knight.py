@@ -45,8 +45,8 @@ def test_t_scraper(generate_fr):
     assert comments[0]['text'] == u'Fucking not safe at Fucking all, Shit Shit Shit'
 
 
-TEST_DSN = 'dbname=test user=edward'
-AL_TEST_DSN = 'postgresql://edward:@/test'
+TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
+AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
 # TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
 # AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
 
@@ -165,16 +165,17 @@ def test_reddit_scraper():
 def test_create(req_context, app, auth_req):
     from whiteapp import Comments
     # assert that there are no entries when we start
-    rows = run_query(req_context.db, "SELECT * FROM comment")
-    assert len(rows) == 0
-    
+    run_query(req_context.db, "TRUNCATE comment", get_results=False)
     Comments.create({'text': u'test', 'user': u'testuser', 'permalink': u'testperma'}, reddit=True)
 
     rows = run_query(req_context.db, "SELECT * FROM comment")
     assert len(rows) == 1
+    assert rows[0] == (1, 'test', 'testuser', True, 'testperma', False)
 
-    comments = Comments.all()
-    for comment in comments:
-        assert comment['text'] is 'test'
-        assert comment['user'] is 'testuser'
-        assert comment['permalink'] is 'testperma'
+def test_whiteapp():
+    pass
+    # test_scraper = scraper
+    # test_scraper.from_reddit = mock.Mock()
+    # whiteapp.scraper = test_scraper
+
+    # whiteapp.get_comments_from_reddit('theredpill', 1000)

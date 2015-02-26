@@ -89,7 +89,6 @@ class Comments(Base):
     def delete_by_id(cls, id):
         comment = DBSession.query(cls).filter(cls.id == id).one()
         DBSession.delete(comment)
-        # transaction.commit()
 
     @classmethod
     def approve_comment(cls, id):
