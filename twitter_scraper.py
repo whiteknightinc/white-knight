@@ -52,7 +52,6 @@ def get_nasty_tweets(handle, tweet_number):
             if word in keywords:
                 score += keywords.get(word)
                 if score >= 10:
-                    # tweets_with_keywords.append(tweet)
                     shitty_tweets[count] = make_nasty_tweet(tweet)
                     count += 1
                     break
