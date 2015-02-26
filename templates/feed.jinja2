@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 {% extends "base.jinja2" %}
 {% block body %}
+  <div class="centered">
   <h2 class="home-header">Feed of Shame</h2>
+  </div>
   <div class="mobile">
     <form action="{{ request.route_url('scrape') }}" method="POST">
       <div class="field">

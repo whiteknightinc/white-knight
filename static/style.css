@@ -387,4 +387,8 @@ VIEWS
   #new-posts {
   margin-left: -15px;
   }
+
+  .subtitle {
+    margin-top: 20px;
+  }
 }
