@@ -38,6 +38,7 @@ cock,3
 cocks,3
 coon,10
 coons,10
+corpse,5
 crap,1
 crapper,1
 crappy,1
@@ -116,6 +117,7 @@ sluts,5
 smegma,10
 spunk,4
 spunked,4
+strangle,5
 tit,2
 tits,2
 tosser,1
