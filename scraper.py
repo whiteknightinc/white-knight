@@ -2,7 +2,7 @@ import praw
 from requests import HTTPError
 
 
-def get_comments(subreddit='all', subnumber=500, addword=None):
+def get_comments(subreddit='all', subnumber=500):
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
 
@@ -17,8 +17,6 @@ def get_comments(subreddit='all', subnumber=500, addword=None):
         word, val = line.rstrip().split(",")
         keywords[word] = int(val)
     f.close()
-    if addword:
-        keywords[addword] = 10
 
     # for top_post in top_posts:
     #     submission = r.get_submission(submission_id=top_post.id)
