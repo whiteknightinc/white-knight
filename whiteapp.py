@@ -134,8 +134,8 @@ def get_entries():
 @view_config(route_name='scrape_twitter', request_method='POST')
 def scrape_twitter(request):
     handle = request.params.get('handle', None)
-    if handle == "":
-        handle = 'DouserBot'
+    # if handle == "":
+    #     handle = 'DouserBot'
     tweet_number = int(request.params.get('tweet_number', None))
     get_tweets(handle, tweet_number)
     return HTTPFound(request.route_url('feed'))

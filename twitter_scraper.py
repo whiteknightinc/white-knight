@@ -20,7 +20,10 @@ def get_nasty_tweets(handle, tweet_number):
     auth = tweepy.OAuthHandler(keys['consumer_key'], keys['consumer_secret'])
     auth.set_access_token(keys['access_token'], keys['access_token_secret'])
     api = tweepy.API(auth)
-    tweets = api.user_timeline(handle, count=tweet_number)
+    if handle == "":
+        tweets = api.home_timeline(count=tweet_number)
+    else:
+        tweets = api.user_timeline(handle, count=tweet_number)
 
     f = open("swearWordsValue.txt")
     keywords = {}
@@ -33,6 +36,8 @@ def get_nasty_tweets(handle, tweet_number):
     shitty_tweets = {}
     count = 0
     for tweet in tweets:
+        if tweet.user.name == 'Douser':
+            continue
         score = 0
         comment_body = tweet.text.lower()
         words = comment_body.split(' ')
