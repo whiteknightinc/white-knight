@@ -26,6 +26,8 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 here = os.path.dirname(os.path.abspath(__file__))
+post_count = 0
+source_name = ''
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -39,8 +41,10 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
+    global post_count
+    global source_name
     if request.authenticated_userid:
-        return {'comments': Comments.all()}
+        return {'comments': Comments.all(), 'post_count': post_count, 'source_name': source_name}
     else:
         return HTTPForbidden()
 
@@ -96,14 +100,24 @@ class Comments(Base):
 
 def get_comments_from_reddit(subreddit, subnumber):
     comments = get_comments(subreddit, subnumber)
+    counter = 0
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
+            counter += 1
             Comments.create(comments[comment], reddit=True)
+    global source_name
+    source_name = subreddit
+    global post_count
+    post_count = counter
 
 
 def get_tweets(handle, tweet_number):
     try:
         tweets = get_nasty_tweets(handle, tweet_number)
+        global source_name
+        source_name = handle
+        global post_count
+        post_count = len(tweets)
         for tweet in tweets:
             if not has_entry(tweets[tweet]['permalink']):
                 Comments.create(tweets[tweet], reddit=False)
