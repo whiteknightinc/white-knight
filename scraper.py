@@ -3,15 +3,28 @@ from requests import HTTPError
 from praw.errors import RedirectException
 
 
-def get_comments(subreddit='all', subnumber=500):
-    r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
-                    'Url: https://github.com/whiteknightinc/white-knight')
+def method():
+    return fake()
 
+def fake():
+    return 3
+
+
+def from_reddit(subreddit, subnumber):
+        r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
+                    'Url: https://github.com/whiteknightinc/white-knight')
+        submission = r.get_subreddit(subreddit)
+        comments = r.get_comments(submission, limit=subnumber)
+        return comments
+
+
+def get_comments(subreddit='all', subnumber=500):
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    submission = r.get_subreddit(subreddit)
-    comments = r.get_comments(submission, limit=subnumber)
-    # comments_with_keywords = []
     result = {}
+    try:
+        comments = from_reddit(subreddit, subnumber)
+    except praw.errors.APIException:
+        raise praw.errors.APIException("reddit's broke")
     f = open("swearWordsValue.txt")
     keywords = {}
     for line in f:

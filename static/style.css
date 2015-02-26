@@ -107,7 +107,12 @@ RECENT
   text-align: center;
   font-family: 'Lobster', sans-serif;
   margin-top: -30px;
+<<<<<<< HEAD
+  color: #fff;
+  text-shadow: 1px 1px 15px #555;
+=======
   color: #444;
+>>>>>>> master
   font-size: 2em;
 }
 
