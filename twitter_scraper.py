@@ -41,14 +41,13 @@ def get_nasty_tweets(handle, tweet_number):
         score = 0
         comment_body = tweet.text.lower()
         words = comment_body.split(' ')
-        length = len(comment_body) / 4
         for word in words:
             word = word.rstrip('.')
             word = word.strip('"')
             word = word.rstrip('?')
             if word in keywords:
                 score += keywords.get(word)
-                if score >= 10 or score >= length:
+                if score >= 10:
                     # tweets_with_keywords.append(tweet)
                     shitty_tweets[count] = make_nasty_tweet(tweet)
                     count += 1
