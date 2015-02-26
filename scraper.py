@@ -1,4 +1,6 @@
 import praw
+from praw.errors import APIException, ClientException
+from requests import HTTPError
 
 
 def get_comments(subreddit='all', subnumber=500, addword=None):
@@ -6,8 +8,13 @@ def get_comments(subreddit='all', subnumber=500, addword=None):
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    submission = r.get_subreddit(subreddit)
+    try:
+        submission = r.get_subreddit(subreddit, fetch=True)
+    except HTTPError:
+        return {}
+    print submission
     comments = r.get_comments(submission, limit=subnumber)
+    print comments
     # comments_with_keywords = []
     result = {}
     f = open("swearWordsValue.txt")

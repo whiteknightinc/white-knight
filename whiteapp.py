@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPError
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 from tweepy import TweepError
@@ -160,10 +160,7 @@ def scrape_reddit(request):
         subnumber = int(request.params.get('sub_number', None))
     except TypeError:
         subnumber = 100
-    # try:
     get_comments_from_reddit(subreddit, subnumber)
-    # except:
-    #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
 
 
