@@ -33,14 +33,13 @@ def get_comments(subreddit='all', subnumber=500):
             score = 0
             comment_body = comment.body.lower()
             words = comment_body.split(' ')
-            length = len(comment_body) / 4
             for word in words:
                 word = word.rstrip('.')
                 word = word.strip('"')
                 word = word.rstrip('?')
                 if word in keywords:
                     score += keywords.get(word)
-                    if score >= 10 or score >= length:
+                    if score >= 10:
                         result[index] = make_nasty_comment(comment)
                         index += 1
                         break
