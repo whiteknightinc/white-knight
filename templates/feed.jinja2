@@ -6,7 +6,14 @@
     <form action="{{ request.route_url('scrape') }}" method="POST">
       <div class="field">
         <label for="subreddit">Subreddit: </label>
-        <input type="text" name="subreddit" id="subreddit"/>
+        <input list="subreddit"/>
+          <datalist id="subreddit">
+            <option value="All">
+            <option value="TheRedPill">
+            <option value="AskReddit">
+            <option value="Politics">
+            <option value="Circlejerk">
+          </datalist>
       </div>
       <div class="field">
         <label for="sub_number">Number of Threads: </label>
