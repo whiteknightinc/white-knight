@@ -8,13 +8,8 @@ def get_comments(subreddit='all', subnumber=500, addword=None):
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    try:
-        submission = r.get_subreddit(subreddit, fetch=True)
-    except HTTPError:
-        return {}
-    print submission
+    submission = r.get_subreddit(subreddit)
     comments = r.get_comments(submission, limit=subnumber)
-    print comments
     # comments_with_keywords = []
     result = {}
     f = open("swearWordsValue.txt")
@@ -33,24 +28,27 @@ def get_comments(subreddit='all', subnumber=500, addword=None):
     #     comments = praw.helpers.flatten_tree(all_comments)
     index = 0
     count = 0
-    for comment in comments:
-        print comment
-        print count
-        count += 1
-        score = 0
-        comment_body = comment.body.lower()
-        words = comment_body.split(' ')
-        length = len(comment_body) / 4
-        for word in words:
-            word = word.rstrip('.')
-            word = word.strip('"')
-            word = word.rstrip('?')
-            if word in keywords:
-                score += keywords.get(word)
-                if score >= 10 or score >= length:
-                    result[index] = make_nasty_comment(comment)
-                    index += 1
-                    break
+    try:
+        for comment in comments:
+            print comment
+            print count
+            count += 1
+            score = 0
+            comment_body = comment.body.lower()
+            words = comment_body.split(' ')
+            length = len(comment_body) / 4
+            for word in words:
+                word = word.rstrip('.')
+                word = word.strip('"')
+                word = word.rstrip('?')
+                if word in keywords:
+                    score += keywords.get(word)
+                    if score >= 10 or score >= length:
+                        result[index] = make_nasty_comment(comment)
+                        index += 1
+                        break
+    except HTTPError:
+        return {}
 
     # result = {}
     # for num in range(len(comments_with_keywords)):
