@@ -26,6 +26,8 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 here = os.path.dirname(os.path.abspath(__file__))
+post_count = 0
+source_name = ''
 
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
@@ -39,8 +41,10 @@ def read_one_comment():
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
+    global post_count
+    global source_name
     if request.authenticated_userid:
-        return {'comments': Comments.all()}
+        return {'comments': Comments.all(), 'post_count': post_count, 'source_name': source_name}
     else:
         return HTTPForbidden()
 
@@ -85,7 +89,6 @@ class Comments(Base):
     def delete_by_id(cls, id):
         comment = DBSession.query(cls).filter(cls.id == id).one()
         DBSession.delete(comment)
-        # transaction.commit()
 
     @classmethod
     def approve_comment(cls, id):
@@ -96,14 +99,24 @@ class Comments(Base):
 
 def get_comments_from_reddit(subreddit, subnumber):
     comments = get_comments(subreddit, subnumber)
+    counter = 0
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
+            counter += 1
             Comments.create(comments[comment], reddit=True)
+    global source_name
+    source_name = subreddit
+    global post_count
+    post_count = counter
 
 
 def get_tweets(handle, tweet_number):
     try:
         tweets = get_nasty_tweets(handle, tweet_number)
+        global source_name
+        source_name = handle
+        global post_count
+        post_count = len(tweets)
         for tweet in tweets:
             if not has_entry(tweets[tweet]['permalink']):
                 Comments.create(tweets[tweet], reddit=False)
@@ -118,12 +131,6 @@ def has_entry(permalink):
             if entry.permalink == permalink:
                 return True
         return False
-
-
-# def remove_entry(id):
-#     id = comment.id
-#     entry = Comments.query.get(id)
-#     DBSession.
 
 
 def get_entries():
@@ -146,7 +153,10 @@ def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
     if subreddit == "":
         subreddit = 'all'
-    subnumber = int(request.params.get('sub_number', None))
+    try:
+        subnumber = int(request.params.get('sub_number', None))
+    except TypeError:
+        subnumber = 100
     # try:
     get_comments_from_reddit(subreddit, subnumber)
     # except:
@@ -170,6 +180,15 @@ def edit(request):
         edit.text = request.params['text']
         # update(request, request.matchdict.get('id', -1))
     return entry
+
+
+@view_config(route_name='remove_one')
+def remove(request):
+    entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
+    entry = entry['entries']
+    Comments.delete_by_id(entry[0].id)
+    transaction.commit()
+    return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='delete_all')
@@ -222,6 +241,7 @@ def main():
     config.add_route('scrape_twitter', '/scrape_twitter')
     config.add_route('tweet', '/tweet/{id}')
     config.add_route('edit_comment', '/edit_comment/{id}')
+    config.add_route('remove_one', '/remove_one/{id}')
     config.add_route('delete_all', '/delete_all')
     config.scan()
     app = config.make_wsgi_app()

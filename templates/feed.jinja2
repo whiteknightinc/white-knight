@@ -1,7 +1,20 @@
 <!DOCTYPE html>
 {% extends "base.jinja2" %}
 {% block body %}
+  <div class="centered">
   <h2 class="home-header">Feed of Shame</h2>
+  </div>
+  <div class="mobile">
+    <form action="{{ request.route_url('scrape') }}" method="POST">
+      <div class="field">
+        <label for="subreddit">Subreddit: </label>
+        <input type="text" name="subreddit" id="subreddit"/>
+      </div>
+      <div class="control_row">
+        <input type="submit" name="Submit" value="Scrape!" id="scrape_button"/>
+      </div>
+    </form>
+  </div>
   <div class="reddit_scrape">
     <form action="{{ request.route_url('scrape') }}" method="POST">
       <div class="field">
@@ -43,8 +56,11 @@
       </div>
     </form>
   </div>
+  <div class='shame_stats'>
+    <p>{{post_count}} post(s) scraped from {{source_name}}!</p>
+  </div>
   <div class="shame-feed">
-   <a href="{{ request.route_url('delete_all') }}"><button class="clear_comments">Clear Comments</button></a>
+  <a href="{{ request.route_url('delete_all') }}"><button class="clear_comments">Clear Comments</button></a>
     {% for comment in comments %}
     {% if not comment.approved %}
     <article class="shame-post">
