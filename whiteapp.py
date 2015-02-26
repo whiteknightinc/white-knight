@@ -89,7 +89,6 @@ class Comments(Base):
     def delete_by_id(cls, id):
         comment = DBSession.query(cls).filter(cls.id == id).one()
         DBSession.delete(comment)
-        # transaction.commit()
 
     @classmethod
     def approve_comment(cls, id):
@@ -132,12 +131,6 @@ def has_entry(permalink):
             if entry.permalink == permalink:
                 return True
         return False
-
-
-# def remove_entry(id):
-#     id = comment.id
-#     entry = Comments.query.get(id)
-#     DBSession.
 
 
 def get_entries():
@@ -187,6 +180,15 @@ def edit(request):
         edit.text = request.params['text']
         # update(request, request.matchdict.get('id', -1))
     return entry
+
+
+@view_config(route_name='remove_one')
+def remove(request):
+    entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
+    entry = entry['entries']
+    Comments.delete_by_id(entry[0].id)
+    transaction.commit()
+    return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='delete_all')
@@ -239,6 +241,7 @@ def main():
     config.add_route('scrape_twitter', '/scrape_twitter')
     config.add_route('tweet', '/tweet/{id}')
     config.add_route('edit_comment', '/edit_comment/{id}')
+    config.add_route('remove_one', '/remove_one/{id}')
     config.add_route('delete_all', '/delete_all')
     config.scan()
     app = config.make_wsgi_app()

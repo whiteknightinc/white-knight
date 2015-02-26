@@ -17,7 +17,7 @@ HEADER
 
 header {
     height: 400px;
-  }
+}
 
 
 h2 {
@@ -306,6 +306,10 @@ EDIT
   font-family: 'Lobster';
   color: #333;
   margin-bottom: -10px;
+}
+
+.remove_comment {
+  margin-bottom: 20px;
 }
 
 /*********
