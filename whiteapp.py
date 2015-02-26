@@ -145,7 +145,7 @@ def scrape_twitter(request):
 def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
     if subreddit == "":
-        subreddit = 'whiteknighttest'
+        subreddit = 'all'
     subnumber = int(request.params.get('sub_number', None))
     # try:
     get_comments_from_reddit(subreddit, subnumber)
