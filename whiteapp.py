@@ -147,10 +147,7 @@ def scrape_reddit(request):
     if subreddit == "":
         subreddit = 'whiteknighttest'
     subnumber = int(request.params.get('sub_number', None))
-    # try:
     get_comments_from_reddit(subreddit, subnumber)
-    # except:
-    #     return HTTPInternalServerError
     return HTTPFound(request.route_url('feed'))
 
 

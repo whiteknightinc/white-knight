@@ -6,8 +6,11 @@ def get_comments(subreddit, subnumber):
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    submission = r.get_subreddit(subreddit)
-    comments = r.get_comments(submission, limit=subnumber)
+    try:
+        submission = r.get_subreddit(subreddit)
+        comments = r.get_comments(submission, limit=subnumber)
+    except praw.errors.APIException:
+        raise praw.errors.APIException("reddit's broke")
     comments_with_keywords = []
     f = open("swearWordsValue.txt")
     keywords = {}
@@ -23,8 +26,8 @@ def get_comments(subreddit, subnumber):
     #     comments = praw.helpers.flatten_tree(all_comments)
     count = 0
     for comment in comments:
-        print comment
-        print count
+        # print comment
+        # print count
         count += 1
         score = 0
         comment_body = comment.body.lower()

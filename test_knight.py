@@ -11,6 +11,7 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.ext.declarative import declarative_base
 from cryptacular.bcrypt import BCRYPTPasswordManager
+from mock import create_autospec
 
 TEST_DSN = 'dbname=test user=edward'
 AL_TEST_DSN = 'postgresql://edward:@/test'
@@ -120,10 +121,16 @@ comments ={}
 
 def test_reddit_scraper():
     from scraper import get_comments
+    import praw
     comments = get_comments('whiteknighttest', 7)
     for num in comments:
         if comments[num]['text'] == 'Shit':
             assert comments[num]['text'] == 'Shit'
+    mock_function = create_autospec(get_comments, return_value='praw.errors.APIException')
+    try:
+        mock_function(get_comments(params), 'error')
+    except error:
+        assert 
 
 def test_scrape_reddit(req_context, app, auth_req):
     from whiteapp import feed
