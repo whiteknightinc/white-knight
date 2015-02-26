@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPError
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 from tweepy import TweepError
@@ -114,7 +114,10 @@ def get_tweets(handle, tweet_number):
     try:
         tweets = get_nasty_tweets(handle, tweet_number)
         global source_name
-        source_name = handle
+        if handle == "":
+            source_name = "DouserBot's feed"
+        else:
+            source_name = handle
         global post_count
         post_count = len(tweets)
         for tweet in tweets:
@@ -133,12 +136,6 @@ def has_entry(permalink):
         return False
 
 
-# def remove_entry(id):
-#     id = comment.id
-#     entry = Comments.query.get(id)
-#     DBSession.
-
-
 def get_entries():
     entries = Comments.all()
     return {'entries': entries}
@@ -147,8 +144,8 @@ def get_entries():
 @view_config(route_name='scrape_twitter', request_method='POST')
 def scrape_twitter(request):
     handle = request.params.get('handle', None)
-    if handle == "":
-        handle = 'DouserBot'
+    # if handle == "":
+    #     handle = 'DouserBot'
     tweet_number = int(request.params.get('tweet_number', None))
     get_tweets(handle, tweet_number)
     return HTTPFound(request.route_url('feed'))
@@ -159,7 +156,10 @@ def scrape_reddit(request):
     subreddit = request.params.get('subreddit', None)
     if subreddit == "":
         subreddit = 'all'
-    subnumber = int(request.params.get('sub_number', None))
+    try:
+        subnumber = int(request.params.get('sub_number', None))
+    except TypeError:
+        subnumber = 100
     get_comments_from_reddit(subreddit, subnumber)
     return HTTPFound(request.route_url('feed'))
 
@@ -180,6 +180,15 @@ def edit(request):
         edit.text = request.params['text']
         # update(request, request.matchdict.get('id', -1))
     return entry
+
+
+@view_config(route_name='remove_one')
+def remove(request):
+    entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
+    entry = entry['entries']
+    Comments.delete_by_id(entry[0].id)
+    transaction.commit()
+    return HTTPFound(request.route_url('home'))
 
 
 @view_config(route_name='delete_all')
@@ -232,6 +241,7 @@ def main():
     config.add_route('scrape_twitter', '/scrape_twitter')
     config.add_route('tweet', '/tweet/{id}')
     config.add_route('edit_comment', '/edit_comment/{id}')
+    config.add_route('remove_one', '/remove_one/{id}')
     config.add_route('delete_all', '/delete_all')
     config.scan()
     app = config.make_wsgi_app()

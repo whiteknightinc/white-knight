@@ -1,4 +1,6 @@
 import praw
+from requests import HTTPError
+from praw.errors import RedirectException
 
 
 def method():
@@ -37,24 +39,35 @@ def get_comments(subreddit='all', subnumber=500):
     #     comments = praw.helpers.flatten_tree(all_comments)
     index = 0
     count = 0
-    for comment in comments:
-        # print comment
-        # print count
-        count += 1
-        score = 0
-        comment_body = comment.body.lower()
-        words = comment_body.split(' ')
-        length = len(comment_body) / 4
-        for word in words:
-            word = word.rstrip('.')
-            word = word.strip('"')
-            word = word.rstrip('?')
-            if word in keywords:
-                score += keywords.get(word)
-                if score >= 10 or score >= length:
-                    result[index] = make_nasty_comment(comment)
-                    index += 1
-                    break
+    try:
+        for comment in comments:
+            print comment
+            print count
+            count += 1
+            score = 0
+            comment_body = comment.body.lower()
+            words = comment_body.split(' ')
+            for word in words:
+                word = word.rstrip('.')
+                word = word.strip('"')
+                word = word.rstrip('?')
+                if word in keywords:
+                    score += keywords.get(word)
+                    if score >= 10:
+                        result[index] = make_nasty_comment(comment)
+                        index += 1
+                        break
+    except HTTPError:
+        return {}
+    except RedirectException:
+        return {}
+
+    # result = {}
+    # for num in range(len(comments_with_keywords)):
+    #     result[num] = {}
+    #     result[num]['text'] = comments_with_keywords[num].body
+    #     result[num]['user'] = comments_with_keywords[num].author.name
+    #     result[num]['permalink'] = comments_with_keywords[num].permalink
     return result
 
 

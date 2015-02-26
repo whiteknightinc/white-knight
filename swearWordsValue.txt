@@ -48,6 +48,8 @@ damn,2
 damned,2
 dick,3
 dicks,3
+die,3
+dies,4
 dildo,3
 dildos,3
 dyke,10
@@ -58,24 +60,35 @@ fagget,10
 fellate,2
 fellates,2
 fellatio,2
+femcunt,10
+femcunts,10
 fuck,5
+fucks,5
 fucker,5
+fuckers,5
 fucking,5
 fucked,5
 fudgepacker,10
 fudgepackers,10
 fudge packer,9
 fudge packers,9
+ho,4
+hoe,3
 homo,5
 homos,5
 jizz,5
 jizzed,5
 jizzing,5
-kill,5
+kill,4
+kills,4
 killing,5
 killed,5
+kill yourself,8
+kill you,8
 labia,2
 labias,2
+motherfucker,5
+mother fucker,5
 muff,3
 muffs,3
 nigger,10

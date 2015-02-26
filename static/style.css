@@ -16,9 +16,8 @@ HEADER
 *********/
 
 header {
-    height: 250px;
-    margin-bottom: 150px;
-  }
+    height: 400px;
+}
 
 
 h2 {
@@ -39,6 +38,7 @@ text-decoration: none;
     text-shadow: 5px 5px 10px #777;
     font-family: 'Lobster', sans-serif;
     margin-left: 10px;
+    padding-bottom: 15px;
     font-size: 2.25em;
     text-align: center;
 }
@@ -54,13 +54,12 @@ text-decoration: none;
 
 .subunit {
     margin: auto;
-    margin-bottom: 5px;
     text-align: center;
     color: #444;
 }
 
 .subtitle {
-  margin-top: 10px;
+  margin-top: 0px;
   font-size: 1em;
 }
 
@@ -130,7 +129,7 @@ GALLERY
     border-bottom: 1px solid #aaa;
     border-top: 1px solid #aaa;
     padding-bottom: 5px;
-    padding-top: 3px;
+    margin-top: 30px;
 }
 
 .entry {
@@ -256,10 +255,20 @@ FEED
   padding: 20px;
   border-radius: 40px;
   box-shadow: 2px 2px 10px rgba(0,0,0,.7);
-  margin-left: 600px;
-  margin-right: 600px;
-  margin-bottom: 10px;
+  display: inline-block;
+  margin: auto;
+  position: fixed;
+  top: 20px;
+  right: 40%;
+  left: 42%;
+}
+
+.shame_stats p {
   text-align: center;
+  font-family: 'Roboto Condensed', sans-serif;
+  margin-top: -10px;
+  margin-bottom: -10px;
+  color: #555;
 }
 
 
@@ -276,15 +285,12 @@ FEED
   box-shadow: 2px 2px 10px rgba(0,0,0,.3);
   background-color: #eee;
   border-radius: 5px;
+  margin-top: 10px;
 }
 
 .twitter {
   margin-top: 12px;
   margin-left: 50px;
-}
-
-#edit_feed {
-  margin-right: 30px;
 }
 
 .clear_comments {
@@ -294,6 +300,20 @@ FEED
   border-radius: 5px;
 }
 
+#mobile_reddit {
+  display: inline-block;
+  margin-right: 50px;
+}
+
+#mobile_twitter {
+  display: inline-block;
+}
+
+.mobile {
+  margin-left: 20px;
+}
+
+
 /*********
 EDIT
 *********/
@@ -302,4 +322,107 @@ EDIT
   font-family: 'Lobster';
   color: #333;
   margin-bottom: -10px;
+}
+
+.remove_comment {
+  margin-bottom: 20px;
+}
+
+/*********
+VIEWS
+*********/
+
+@media (max-width: 540px) {
+  .mission {
+    visibility: hidden;
+  }
+
+  .subunit {
+    margin-top: -80px;
+  }
+
+  .tweet_scrape {
+    visibility: hidden;
+  }
+
+  .reddit_scrape {
+    visibility: hidden;
+  }
+
+  .mobile {
+    margin-bottom: 20px;
+  }
+
+  .shame-post {
+    width: 80%
+  }
+
+  #mobile_reddit {
+    margin-right: 22px;
+    margin-bottom: 20px;
+    margin-top: 20px;
+  }
+
+  #mobile_twitter {
+    margin-top: 30px;
+    margin-right: 22px;
+    margin-bottom: 50px;
+  }
+
+}
+
+@media (min-width: 481px) and (max-width: 800px) {
+  .mission {
+    visibility: hidden;
+  }
+
+  .subunit {
+    margin-top: -40px;
+  }
+}
+
+
+@media (max-width: 1000px) {
+  .tweet_scrape {
+    visibility: hidden;
+  }
+
+  .reddit_scrape {
+    visibility: hidden;
+  }
+
+  .mobile {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .shame-post {
+    width: 60%
+  }
+
+  .shame_stats {
+    visibility: hidden;
+  }
+}
+
+@media (min-width: 1001px) {
+  html {
+    margin-left: 25px;
+  }
+
+  .mobile {
+    visibility: hidden;
+  }
+
+  .home-header {
+    border: none;
+  }
+
+  #new-posts {
+  margin-left: -15px;
+  }
+
+  .subtitle {
+    margin-top: 20px;
+  }
 }
