@@ -114,7 +114,10 @@ def get_tweets(handle, tweet_number):
     try:
         tweets = get_nasty_tweets(handle, tweet_number)
         global source_name
-        source_name = handle
+        if handle == "":
+            source_name = "DouserBot's feed"
+        else:
+            source_name = handle
         global post_count
         post_count = len(tweets)
         for tweet in tweets:
