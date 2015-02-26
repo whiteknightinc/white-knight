@@ -2,6 +2,9 @@ import praw
 
 
 def method():
+    return fake()
+
+def fake():
     return 3
 
 

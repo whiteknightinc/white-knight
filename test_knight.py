@@ -13,15 +13,44 @@ from sqlalchemy.ext.declarative import declarative_base
 from cryptacular.bcrypt import BCRYPTPasswordManager
 import mock
 import scraper
+import whiteapp
+import praw
 
 
-def test_t_scraper():
+class FakeComment(object):
+    class Author(object):
+        def __init__(self, name):
+            self.name = name
+
+    def __init__(self, body, author, permalink):
+        super(FakeComment, self).__init__()
+        self.body = body
+        self.author = self.Author(author)
+        self.permalink = permalink
+
+@pytest.fixture(scope='session')
+def generate_fr():
+    c1 = FakeComment(u'safe', u'Tom', u'www.site1.com')
+    c2 = FakeComment(u'should be safe', u'Dick', u'www.site2.com')
+    c3 = FakeComment(u'Fucking not safe at Fucking all, Shit Shit Shit', u'Harry', u'www.site3.com')
+    return [c1, c2, c3]
+
+
+def test_t_scraper(generate_fr):
+
     test_scraper = scraper
-    com = test_scraper.from_reddit('whiteknighttest', 100)
-    type(com)
+    test_scraper.from_reddit = mock.Mock(return_value=generate_fr)
+    comments = test_scraper.get_comments('gaming', 100)
+    assert len(comments) == 1
+    assert comments[0]['text'] == u'Fucking not safe at Fucking all, Shit Shit Shit'
+    whiteapp.get_comments = mock.Mock(side_effect=praw.errors.RedirectException)
+    whiteapp.get_comments_from_reddit('theredpill', 100)
+
 
 TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
 AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
+# TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
+# AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
