@@ -1,5 +1,4 @@
 import praw
-from praw.errors import APIException, ClientException
 from requests import HTTPError
 
 
