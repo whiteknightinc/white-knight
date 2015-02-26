@@ -1,5 +1,6 @@
 import praw
 from requests import HTTPError
+from praw.errors import RedirectException
 
 
 def get_comments(subreddit='all', subnumber=500):
@@ -44,6 +45,8 @@ def get_comments(subreddit='all', subnumber=500):
                         index += 1
                         break
     except HTTPError:
+        return {}
+    except RedirectException:
         return {}
 
     # result = {}
