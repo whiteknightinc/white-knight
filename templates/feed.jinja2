@@ -2,6 +2,17 @@
 {% extends "base.jinja2" %}
 {% block body %}
   <h2 class="home-header">Feed of Shame</h2>
+  <div class="mobile">
+    <form action="{{ request.route_url('scrape') }}" method="POST">
+      <div class="field">
+        <label for="subreddit">Subreddit: </label>
+        <input type="text" name="subreddit" id="subreddit"/>
+      </div>
+      <div class="control_row">
+        <input type="submit" name="Submit" value="Scrape!" id="scrape_button"/>
+      </div>
+    </form>
+  </div>
   <div class="reddit_scrape">
     <form action="{{ request.route_url('scrape') }}" method="POST">
       <div class="field">

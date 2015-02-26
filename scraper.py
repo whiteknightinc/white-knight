@@ -1,7 +1,7 @@
 import praw
 
 
-def get_comments(subreddit, subnumber):
+def get_comments(subreddit, subnumber=500):
     r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
                     'Url: https://github.com/whiteknightinc/white-knight')
 
