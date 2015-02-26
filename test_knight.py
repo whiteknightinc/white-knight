@@ -43,12 +43,10 @@ def test_t_scraper(generate_fr):
     comments = test_scraper.get_comments('gaming', 100)
     assert len(comments) == 1
     assert comments[0]['text'] == u'Fucking not safe at Fucking all, Shit Shit Shit'
-    whiteapp.get_comments = mock.Mock(side_effect=praw.errors.RedirectException)
-    whiteapp.get_comments_from_reddit('theredpill', 100)
 
 
-TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
-AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
+TEST_DSN = 'dbname=test user=edward'
+AL_TEST_DSN = 'postgresql://edward:@/test'
 # TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
 # AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
 
@@ -164,19 +162,19 @@ def test_reddit_scraper():
             assert comments[num]['text'] == 'Shit'
 
 
-def test_scrape_reddit(req_context, app, auth_req):
-    from whiteapp import feed
+def test_create(req_context, app, auth_req):
+    from whiteapp import Comments
     # assert that there are no entries when we start
     rows = run_query(req_context.db, "SELECT * FROM comment")
     assert len(rows) == 0
+    
+    Comments.create({'text': u'test', 'user': u'testuser', 'permalink': u'testperma'}, reddit=True)
 
-    # add comments from whiteknighttest to database
-    entry_data = {
-        'subreddit': 'whiteknighttest',
-        'sub_number': 7,
-    }
-    app.post('/scrape', params=entry_data, status='3*')
-    auth_req.params = {'username': 'admin', 'password': 'secret'}
-    db_comments = feed(auth_req)
-    for num in comments:
-        assert comments[num] in db_comments
+    rows = run_query(req_context.db, "SELECT * FROM comment")
+    assert len(rows) == 1
+
+    comments = Comments.all()
+    for comment in comments:
+        assert comment['text'] is 'test'
+        assert comment['user'] is 'testuser'
+        assert comment['permalink'] is 'testperma'
