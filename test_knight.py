@@ -17,11 +17,14 @@ import scraper
 
 def test_t_scraper():
     test_scraper = scraper
-    com = test_scraper.from_reddit('whiteknighttest', 100)
-    print type(com)
+    actual = {}
+    test_scraper.fake = mock.Mock(return_value=0)
+    print test_scraper.method()
 
-TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
-AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
+TEST_DSN = 'dbname=test user=edward'
+AL_TEST_DSN = 'postgresql://edward:@/test'
+# TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
+# AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
