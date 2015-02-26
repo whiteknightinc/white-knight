@@ -6,10 +6,13 @@ def get_comments(subreddit='all', subnumber=500):
                     'Url: https://github.com/whiteknightinc/white-knight')
 
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
-    submission = r.get_subreddit(subreddit)
-    comments = r.get_comments(submission, limit=subnumber)
-    # comments_with_keywords = []
     result = {}
+
+    try:
+        submission = r.get_subreddit(subreddit)
+        comments = r.get_comments(submission, limit=subnumber)
+    except praw.errors.APIException:
+        raise praw.errors.APIException("reddit's broke")
     f = open("swearWordsValue.txt")
     keywords = {}
     for line in f:
@@ -25,8 +28,8 @@ def get_comments(subreddit='all', subnumber=500):
     index = 0
     count = 0
     for comment in comments:
-        print comment
-        print count
+        # print comment
+        # print count
         count += 1
         score = 0
         comment_body = comment.body.lower()
@@ -42,13 +45,6 @@ def get_comments(subreddit='all', subnumber=500):
                     result[index] = make_nasty_comment(comment)
                     index += 1
                     break
-
-    # result = {}
-    # for num in range(len(comments_with_keywords)):
-    #     result[num] = {}
-    #     result[num]['text'] = comments_with_keywords[num].body
-    #     result[num]['user'] = comments_with_keywords[num].author.name
-    #     result[num]['permalink'] = comments_with_keywords[num].permalink
     return result
 
 
