@@ -18,7 +18,7 @@ import scraper
 def test_t_scraper():
     test_scraper = scraper
     com = test_scraper.from_reddit('whiteknighttest', 100)
-    print type(com)
+    type(com)
 
 TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
 AL_TEST_DSN = 'postgresql://roberthaskell:@/test_learning_journal'
