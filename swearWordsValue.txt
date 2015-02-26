@@ -66,6 +66,8 @@ fudgepacker,10
 fudgepackers,10
 fudge packer,9
 fudge packers,9
+ho,4
+hoe,3
 homo,5
 homos,5
 jizz,5
@@ -76,6 +78,8 @@ killing,5
 killed,5
 labia,2
 labias,2
+motherfucker,5
+mother fucker,5
 muff,3
 muffs,3
 nigger,10
