@@ -3,7 +3,7 @@ import tweepy
 
 def load_keys():
     keydict = {}
-    with open('twitterkeys.txt', 'r') as f:
+    with open('newtwitterkeys.txt', 'r') as f:
         keydict['consumer_key'] = f.readline().rstrip()
         keydict['consumer_secret'] = f.readline().rstrip()
         keydict['access_token'] = f.readline().rstrip()
