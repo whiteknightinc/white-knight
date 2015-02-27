@@ -13,7 +13,7 @@ def load_keys():
     return keydict
 
 
-def get_nasty_tweets(handle, tweet_number):
+def get_nasty_tweets(handle="DouserBot", tweet_number=100):
     """
     Get most recent [number] tweets from the specified handle. If handle
     is not specified, grab the feed from DouserBot. Return a dictionary of
@@ -78,7 +78,7 @@ def make_nasty_tweet(tweet):
     """
     user = tweet.user.name
     ident = tweet.id
-    permalink = "www.twitter.com/" + user + "/status/" + str(ident)
+    permalink = "http://www.twitter.com/" + user + "/status/" + str(ident)
     dicttweet = {
             'text': tweet.text,
             'user': user,

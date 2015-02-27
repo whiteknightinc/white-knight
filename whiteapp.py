@@ -169,9 +169,12 @@ def get_entries():
 def scrape_twitter(request):
     """Scrape over Twitter for posts that fit the parameters establshed."""
     handle = request.params.get('handle', None)
-    # if handle == "":
-    #     handle = 'DouserBot'
-    tweet_number = int(request.params.get('tweet_number', None))
+    if handle == "":
+        handle = 'DouserBot'
+    try:
+        tweet_number = int(request.params.get('tweet_number', None))
+    except TypeError:
+        tweet_number = 100
     get_tweets(handle, tweet_number)
     return HTTPFound(request.route_url('feed'))
 
