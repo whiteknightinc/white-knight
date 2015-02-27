@@ -5,7 +5,7 @@ from praw.errors import RedirectException
 
 def from_reddit(subreddit, subnumber):
         r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
-                'Url: https://github.com/whiteknightinc/white-knight')
+                        'Url: https://github.com/whiteknightinc/white-knight')
         submission = r.get_subreddit(subreddit)
         comments = r.get_comments(submission, limit=subnumber)
         return comments
@@ -27,13 +27,9 @@ def get_comments(subreddit='all', subnumber=500):
         keywords[word] = int(val)
     f.close()
 
-    index = 0
-    count = 0
     try:
+        index = 0
         for comment in comments:
-            print comment
-            print count
-            count += 1
             score = 0
             comment_body = comment.body.lower()
             words = comment_body.split(' ')
@@ -67,8 +63,3 @@ def make_nasty_comment(comment):
         'permalink': permalink
     }
     return dictcomment
-
-if __name__ == '__main__':
-    entries = get_comments('whiteknighttest', 5)
-    for num in entries:
-        print entries[num]['text']

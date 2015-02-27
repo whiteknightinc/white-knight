@@ -67,8 +67,6 @@ def tweet_it_out(stat):
     auth = tweepy.OAuthHandler(keys['consumer_key'], keys['consumer_secret'])
     auth.set_access_token(keys['access_token'], keys['access_token_secret'])
     api = tweepy.API(auth)
-
-    # twitter won't let you tweet out duplicates
     api.update_status(status=stat)
 
 
@@ -80,11 +78,8 @@ def make_nasty_tweet(tweet):
     ident = tweet.id
     permalink = "http://www.twitter.com/" + user + "/status/" + str(ident)
     dicttweet = {
-            'text': tweet.text,
-            'user': user,
-            'permalink': permalink
-            }
+        'text': tweet.text,
+        'user': user,
+        'permalink': permalink
+        }
     return dicttweet
-
-if __name__ == '__main__':
-    print get_nasty_tweets()

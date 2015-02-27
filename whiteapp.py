@@ -4,7 +4,7 @@ from pyramid.view import view_config
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.security import remember, forget
-from pyramid.httpexceptions import HTTPFound, HTTPForbidden, HTTPError
+from pyramid.httpexceptions import HTTPFound, HTTPForbidden
 from cryptacular.bcrypt import BCRYPTPasswordManager
 from waitress import serve
 from tweepy import TweepError
@@ -15,7 +15,6 @@ from sqlalchemy.orm import (
     scoped_session,
     sessionmaker,
 )
-import transaction
 from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
 from twitter_scraper import get_nasty_tweets
@@ -27,28 +26,9 @@ DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
 here = os.path.dirname(os.path.abspath(__file__))
+
 post_count = 0
 source_name = ''
-
-
-@view_config(route_name='home', renderer='templates/home.jinja2')
-def home(request):
-    """Return the 5 most recently tweeted posts."""
-    return {'comments': Comments.home()}
-
-
-@view_config(route_name='feed', renderer='templates/feed.jinja2')
-def feed(request):
-    """Return the scraped objects from Reddit and Twitter if logged in."""
-    global post_count
-    global source_name
-    if request.authenticated_userid:
-        return {'comments': Comments.all(),
-                'post_count': post_count,
-                'source_name': source_name
-                }
-    else:
-        return HTTPForbidden()
 
 
 class Comments(Base):
@@ -104,25 +84,47 @@ class Comments(Base):
         comment.approved = True
 
 
-def get_comments_from_reddit(subreddit, subnumber):
-    try:
-        comments = get_comments(subreddit, subnumber)
-    except ConnectionError:
-        raise ConnectionError('connection error')
-    """
-    Run the scraper over Reddit with a
-    defined number of comments and a
-    specified subreddit.
-    """
-    counter = 0
-    for comment in comments:
-        if not has_entry(comments[comment]['permalink']):
-            counter += 1
-            Comments.create(comments[comment], reddit=True)
-    global source_name
-    source_name = subreddit
+def has_entry(permalink):
+    """Determine if a post has a permalink or not."""
+    entries = Comments.all()
+    for entry in entries:
+        if entry.permalink == permalink:
+            return True
+    return False
+
+
+@view_config(route_name='home', renderer='templates/home.jinja2')
+def home(request):
+    """Return the 5 most recently tweeted posts."""
+    return {'comments': Comments.home()}
+
+
+@view_config(route_name='feed', renderer='templates/feed.jinja2')
+def feed(request):
+    """Return the scraped objects from Reddit and Twitter if logged in."""
     global post_count
-    post_count = counter
+    global source_name
+    if request.authenticated_userid:
+        return {'comments': Comments.all(),
+                'post_count': post_count,
+                'source_name': source_name
+                }
+    else:
+        return HTTPForbidden()
+
+
+@view_config(route_name='scrape_twitter', request_method='POST')
+def scrape_twitter(request):
+    """Scrape over Twitter for posts that fit the parameters establshed."""
+    handle = request.params.get('handle', None)
+    if handle == "":
+        handle = 'DouserBot'
+    try:
+        tweet_number = int(request.params.get('tweet_number', None))
+    except TypeError:
+        tweet_number = 100
+    get_tweets(handle, tweet_number)
+    return HTTPFound(request.route_url('feed'))
 
 
 def get_tweets(handle, tweet_number):
@@ -148,36 +150,6 @@ def get_tweets(handle, tweet_number):
         return {}
 
 
-def has_entry(permalink):
-    """Determine if a post has a permalink or not."""
-    # dictionary of permalinks
-    entries = Comments.all()
-    for entry in entries:
-        if entry.permalink == permalink:
-            return True
-    return False
-
-
-def get_entries():
-    """Return a dictionary with each post that was caught by the scraper."""
-    entries = Comments.all()
-    return {'entries': entries}
-
-
-@view_config(route_name='scrape_twitter', request_method='POST')
-def scrape_twitter(request):
-    """Scrape over Twitter for posts that fit the parameters establshed."""
-    handle = request.params.get('handle', None)
-    if handle == "":
-        handle = 'DouserBot'
-    try:
-        tweet_number = int(request.params.get('tweet_number', None))
-    except TypeError:
-        tweet_number = 100
-    get_tweets(handle, tweet_number)
-    return HTTPFound(request.route_url('feed'))
-
-
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
     """Scrape over Reddit for posts that fit the parameters establshed."""
@@ -190,6 +162,27 @@ def scrape_reddit(request):
         subnumber = 100
     get_comments_from_reddit(subreddit, subnumber)
     return HTTPFound(request.route_url('feed'))
+
+
+def get_comments_from_reddit(subreddit, subnumber):
+    """
+    Run the scraper over Reddit with a
+    defined number of comments and a
+    specified subreddit.
+    """
+    try:
+        comments = get_comments(subreddit, subnumber)
+    except ConnectionError:
+        raise ConnectionError('connection error')
+    counter = 0
+    for comment in comments:
+        if not has_entry(comments[comment]['permalink']):
+            counter += 1
+            Comments.create(comments[comment], reddit=True)
+    global source_name
+    source_name = subreddit
+    global post_count
+    post_count = counter
 
 
 @view_config(route_name="tweet")
@@ -210,7 +203,6 @@ def edit(request):
         edit = entry['entries'][0]
         edit.title = request.params['title']
         edit.text = request.params['text']
-        # update(request, request.matchdict.get('id', -1))
     return entry
 
 
@@ -232,6 +224,45 @@ def delete(request):
     return HTTPFound(request.route_url('feed'))
 
 
+@view_config(route_name='login', renderer="templates/login.jinja2")
+def login(request):
+    """authenticate a user by username/password"""
+    username = request.params.get('username', '')
+    error = ''
+    if request.method == 'POST':
+        error = "Login Failed"
+        authenticated = False
+        try:
+            authenticated = do_login(request)
+        except ValueError as val_err:
+            error = str(val_err)
+
+        if authenticated:
+            headers = remember(request, username)
+            return HTTPFound(request.route_url('home'), headers=headers)
+
+    return {'error': error, 'username': username}
+
+
+def do_login(request):
+    username = request.params.get('username', None)
+    password = request.params.get('password', None)
+    if not (username and password):
+        raise ValueError('both username and password are required')
+
+    settings = request.registry.settings
+    manager = BCRYPTPasswordManager()
+    if username == settings.get('auth.username', ''):
+        hashed = settings.get('auth.password', '')
+        return manager.check(hashed, password)
+
+
+@view_config(route_name='logout')
+def logout(request):
+    headers = forget(request)
+    return HTTPFound(request.route_url('home'), headers=headers)
+
+
 def main():
     """Create a configured wsgi app"""
     settings = {}
@@ -249,9 +280,7 @@ def main():
     )
     secret = os.environ.get('JOURNAL_SESSION_SECRET', 'itsaseekrit')
     session_factory = SignedCookieSessionFactory(secret)
-    # add a secret value for auth tkt signing
     auth_secret = os.environ.get('JOURNAL_AUTH_SECRET', 'anotherseekrit')
-    # configuration setup
     config = Configurator(
         settings=settings,
         session_factory=session_factory,
@@ -280,45 +309,6 @@ def main():
     return app
 
 
-def do_login(request):
-    username = request.params.get('username', None)
-    password = request.params.get('password', None)
-    if not (username and password):
-        raise ValueError('both username and password are required')
-
-    settings = request.registry.settings
-    manager = BCRYPTPasswordManager()
-    if username == settings.get('auth.username', ''):
-        hashed = settings.get('auth.password', '')
-        return manager.check(hashed, password)
-
-
-@view_config(route_name='login', renderer="templates/login.jinja2")
-def login(request):
-    """authenticate a user by username/password"""
-    username = request.params.get('username', '')
-    error = ''
-    if request.method == 'POST':
-        error = "Login Failed"
-        authenticated = False
-        try:
-            authenticated = do_login(request)
-        except ValueError as val_err:
-            error = str(val_err)
-
-        if authenticated:
-            headers = remember(request, username)
-            return HTTPFound(request.route_url('home'), headers=headers)
-
-    return {'error': error, 'username': username}
-
-
-@view_config(route_name='logout')
-def logout(request):
-    headers = forget(request)
-    return HTTPFound(request.route_url('home'), headers=headers)
-
 if __name__ == '__main__':
-    # config.add_view(hello_world, route_name='hello')
     main = main()
     serve(main, host='0.0.0.0', port=8080)
