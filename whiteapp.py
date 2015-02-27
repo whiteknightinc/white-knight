@@ -20,7 +20,7 @@ from scraper import get_comments
 from twitter_scraper import get_nasty_tweets
 from twitter_scraper import tweet_it_out
 from requests import ConnectionError
-
+import requests
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
@@ -174,6 +174,8 @@ def get_comments_from_reddit(subreddit, subnumber):
         comments = get_comments(subreddit, subnumber)
     except ConnectionError:
         raise ConnectionError('connection error')
+    except requests.Timeout:
+        return HTTPFound(requests.route_url('feed'))
     counter = 0
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
