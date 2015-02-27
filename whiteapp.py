@@ -32,19 +32,20 @@ source_name = ''
 
 @view_config(route_name='home', renderer='templates/home.jinja2')
 def home(request):
+    """Return the 5 most recently tweeted posts."""
     return {'comments': Comments.home()}
-
-
-def read_one_comment():
-    return {'comments': Comments.all()}
 
 
 @view_config(route_name='feed', renderer='templates/feed.jinja2')
 def feed(request):
+    """Return the scraped objects from Reddit and Twitter if logged in."""
     global post_count
     global source_name
     if request.authenticated_userid:
-        return {'comments': Comments.all(), 'post_count': post_count, 'source_name': source_name}
+        return {'comments': Comments.all(),
+                'post_count': post_count,
+                'source_name': source_name
+                }
     else:
         return HTTPForbidden()
 
@@ -60,6 +61,7 @@ class Comments(Base):
 
     @classmethod
     def create(cls, comment, reddit):
+        """Create a post with the attributes specified in scraper."""
         text = comment['text']
         username = comment['user']
         permalink = comment['permalink']
@@ -75,23 +77,29 @@ class Comments(Base):
 
     @classmethod
     def all(cls):
+        """Return all posts in a descending order."""
         return DBSession.query(cls).order_by(cls.id.desc()).all()
 
     @classmethod
     def home(cls):
-        return DBSession.query(cls).filter(cls.approved).order_by(cls.id.desc()).limit(5)
+        """Return only approved posts in descending order limiting to 5."""
+        return DBSession.query(cls).filter(cls.approved).\
+            order_by(cls.id.desc()).limit(5)
 
     @classmethod
     def by_id(cls, id):
+        """Return one post by its id."""
         return DBSession.query(cls).filter(cls.id == id).one()
 
     @classmethod
     def delete_by_id(cls, id):
+        """Remove a post based on its id."""
         comment = DBSession.query(cls).filter(cls.id == id).one()
         DBSession.delete(comment)
 
     @classmethod
     def approve_comment(cls, id):
+        """Change the posts value for 'Approved' to 'True'."""
         comment = DBSession.query(cls).filter(cls.id == id).one()
         comment.approved = True
         transaction.commit()
@@ -102,6 +110,11 @@ def get_comments_from_reddit(subreddit, subnumber):
         comments = get_comments(subreddit, subnumber)
     except ConnectionError:
         raise ConnectionError('connection error')
+    """
+    Run the scraper over Reddit with a
+    defined number of comments and a
+    specified subreddit.
+    """
     counter = 0
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
@@ -114,6 +127,11 @@ def get_comments_from_reddit(subreddit, subnumber):
 
 
 def get_tweets(handle, tweet_number):
+    """
+    Run the scraper over Twitter with a
+    defined number of tweets and a
+    specified account.
+    """
     global source_name
     try:
         tweets = get_nasty_tweets(handle, tweet_number)
@@ -132,21 +150,24 @@ def get_tweets(handle, tweet_number):
 
 
 def has_entry(permalink):
-        # dictionary of permalinks
-        entries = Comments.all()
-        for entry in entries:
-            if entry.permalink == permalink:
-                return True
-        return False
+    """Determine if a post has a permalink or not."""
+    # dictionary of permalinks
+    entries = Comments.all()
+    for entry in entries:
+        if entry.permalink == permalink:
+            return True
+    return False
 
 
 def get_entries():
+    """Return a dictionary with each post that was caught by the scraper."""
     entries = Comments.all()
     return {'entries': entries}
 
 
 @view_config(route_name='scrape_twitter', request_method='POST')
 def scrape_twitter(request):
+    """Scrape over Twitter for posts that fit the parameters establshed."""
     handle = request.params.get('handle', None)
     # if handle == "":
     #     handle = 'DouserBot'
@@ -157,6 +178,7 @@ def scrape_twitter(request):
 
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
+    """Scrape over Reddit for posts that fit the parameters establshed."""
     subreddit = request.params.get('subreddit', None)
     if subreddit == "":
         subreddit = 'all'
@@ -170,13 +192,17 @@ def scrape_reddit(request):
 
 @view_config(route_name="tweet")
 def tweet_comment(request):
+    """Tweet out a specified post."""
     tweet_it_out(request.params.get('text', "ignore this tweet"))
     Comments.approve_comment(request.matchdict.get('id', -1))
     return HTTPFound(request.route_url('feed'))
 
 
-@view_config(route_name='edit_comment', renderer='templates/editcomment.jinja2')
+@view_config(route_name='edit_comment',
+             renderer='templates/editcomment.jinja2'
+             )
 def edit(request):
+    """Allow for editing of a post before Tweeting it out."""
     entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
     if request.method == 'POST':
         edit = entry['entries'][0]
@@ -197,6 +223,7 @@ def remove(request):
 
 @view_config(route_name='delete_all')
 def delete(request):
+    """Delete all unapproved comments from the admin feed."""
     comments = Comments.all()
     for comment in comments:
         if not comment.approved:
