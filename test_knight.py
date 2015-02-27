@@ -194,7 +194,7 @@ def test_twitter_connection():
 def test_getting_correct_comments(generate_fr):
     test_scraper = scraper
     test_scraper.from_reddit = mock.Mock(return_value=generate_fr)
-    comments = test_scraper.get_comments('gaming', 100)
+    comments, timeout = test_scraper.get_comments('gaming', 100)
     assert len(comments) == 1
     assert comments[0]['text'] == u'Fucking not safe at Fucking all, Shit Shit Shit'
 
