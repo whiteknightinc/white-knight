@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS comment (
 )
 """
 
+
 class FakeComment(object):
     class Author(object):
         def __init__(self, name):
@@ -44,6 +45,7 @@ class FakeComment(object):
         self.body = body
         self.author = self.Author(author)
         self.permalink = permalink
+
 
 @pytest.fixture(scope='session')
 def generate_fr():
@@ -57,6 +59,7 @@ def generate_fr():
 def authorize():
     login_data = {'username': 'admin', 'password': 'secret'}
     return app.post('/login', params=login_data, status='*')
+
 
 @pytest.fixture(scope='session')
 def db(request):
@@ -75,9 +78,11 @@ def db(request):
 
     return settings
 
+
 def connect_db(settings):
     """Return a connection to the configured database"""
     return psycopg2.connect(settings['db'])
+
 
 @pytest.fixture(scope='function')
 def app(db):
@@ -87,6 +92,7 @@ def app(db):
     os.environ['DATABASE_URL'] = AL_TEST_DSN
     app = main()
     return TestApp(app)
+
 
 @pytest.yield_fixture(scope='function')
 def req_context(db, request):
@@ -98,6 +104,7 @@ def req_context(db, request):
         req.exception = None
         yield req
 
+
 def run_query(db, query, params=(), get_results=True):
     cursor = db.cursor()
     cursor.execute(query, params)
@@ -106,6 +113,7 @@ def run_query(db, query, params=(), get_results=True):
     if get_results:
         results = cursor.fetchall()
     return results
+
 
 @pytest.fixture(scope='function')
 def auth_req(request):
@@ -124,6 +132,7 @@ def auth_req(request):
 
     return req
 
+
 def test_do_login_success(auth_req):
     from whiteapp import do_login
     auth_req.params = {'username': 'admin', 'password': 'secret'}
@@ -134,9 +143,10 @@ def test_create(req_context, app, auth_req):
     # assert that there are no entries when we start
     run_query(req_context.db, "TRUNCATE comment", get_results=False)
     Comments.create({'text': u'test', 'user': u'testuser', 'permalink': u'testperma'}, reddit=True)
-    rows = run_query(req_context.db, "SELECT * FROM comment")
+    rows = Comments.all()
     assert len(rows) == 1
     assert rows[0] == (1, 'test', 'testuser', True, 'testperma', False)
+    Comments.delete_by_id(1)
 
 
 def test_reddit_connection():
@@ -149,6 +159,7 @@ def test_twitter_connection():
     whiteapp.get_nasty_tweets = mock.Mock(side_effect=requests.ConnectionError('connection error'))
     with pytest.raises(requests.ConnectionError):
         assert whiteapp.get_nasty_tweets()
+
 
 def test_getting_correct_comments(generate_fr):
     test_scraper = scraper

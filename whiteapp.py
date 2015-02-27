@@ -22,6 +22,7 @@ from twitter_scraper import get_nasty_tweets
 from twitter_scraper import tweet_it_out
 from requests import ConnectionError
 
+
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
 
@@ -73,7 +74,6 @@ class Comments(Base):
                         approved=False
                         )
         DBSession.add(new_entry)
-        transaction.commit()
 
     @classmethod
     def all(cls):
@@ -102,7 +102,6 @@ class Comments(Base):
         """Change the posts value for 'Approved' to 'True'."""
         comment = DBSession.query(cls).filter(cls.id == id).one()
         comment.approved = True
-        transaction.commit()
 
 
 def get_comments_from_reddit(subreddit, subnumber):
@@ -217,7 +216,6 @@ def remove(request):
     entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
     entry = entry['entries']
     Comments.delete_by_id(entry[0].id)
-    transaction.commit()
     return HTTPFound(request.route_url('home'))
 
 
@@ -228,7 +226,6 @@ def delete(request):
     for comment in comments:
         if not comment.approved:
             Comments.delete_by_id(comment.id)
-    transaction.commit()
     return HTTPFound(request.route_url('feed'))
 
 
@@ -264,6 +261,7 @@ def main():
     )
     config.add_static_view('static', os.path.join(here, 'static'))
     config.include('pyramid_jinja2')
+    config.include('pyramid_tm')
     config.add_route('home', '/')
     config.add_route('login', '/login')
     config.add_route('logout', '/logout')
