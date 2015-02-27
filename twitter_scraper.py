@@ -20,6 +20,7 @@ def get_nasty_tweets(handle, tweet_number):
     auth = tweepy.OAuthHandler(keys['consumer_key'], keys['consumer_secret'])
     auth.set_access_token(keys['access_token'], keys['access_token_secret'])
     api = tweepy.API(auth)
+
     if handle == "":
         tweets = api.home_timeline(count=tweet_number)
     else:
