@@ -158,8 +158,11 @@ def test_getting_correct_comments(generate_fr):
     assert comments[0]['text'] == u'Fucking not safe at Fucking all, Shit Shit Shit'
 
 
+def test_approve_comment():
+    pass
+
+
 def test_remove_all():
-    
     pass
 
 
