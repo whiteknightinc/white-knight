@@ -188,9 +188,12 @@ def get_comments_from_reddit(subreddit, subnumber):
 @view_config(route_name="tweet")
 def tweet_comment(request):
     """Tweet out a specified post."""
-    tweet_it_out(request.params.get('text', "ignore this tweet"))
-    Comments.approve_comment(request.matchdict.get('id', -1))
-    return HTTPFound(request.route_url('feed'))
+    try:
+        tweet_it_out(request.params.get('text', "ignore this tweet"))
+        Comments.approve_comment(request.matchdict.get('id', -1))
+        return HTTPFound(request.route_url('feed'))
+    except TweepError:
+        return HTTPFound(request.route_url('edit_comment', id=request.matchdict.get('id', -1)))
 
 
 @view_config(route_name='edit_comment',
@@ -208,9 +211,8 @@ def edit(request):
 
 @view_config(route_name='remove_one')
 def remove(request):
-    entry = {'entries': [Comments.by_id(request.matchdict.get('id', -1))]}
-    entry = entry['entries']
-    Comments.delete_by_id(entry[0].id)
+    entry = Comments.by_id(request.matchdict.get('id', -1))
+    Comments.delete_by_id(entry.id)
     return HTTPFound(request.route_url('home'))
 
 
