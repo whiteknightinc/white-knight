@@ -18,6 +18,11 @@ import praw
 import requests
 from tweepy import TweepError
 from whiteapp import Comments
+import transaction
+
+
+DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
+Base = declarative_base()
 
 
 TEST_DSN = 'dbname=test_learning_journal user=roberthaskell'
@@ -143,10 +148,35 @@ def test_create(req_context, app, auth_req):
     # assert that there are no entries when we start
     run_query(req_context.db, "TRUNCATE comment", get_results=False)
     Comments.create({'text': u'test', 'user': u'testuser', 'permalink': u'testperma'}, reddit=True)
-    rows = Comments.all()
-    assert len(rows) == 1
-    assert rows[0] == (1, 'test', 'testuser', True, 'testperma', False)
+    transaction.commit()
+    com = Comments.all()
+    transaction.commit()
+    assert len(com) == 1
+
+
+def test_delete():
+    com = Comments.all()
+    transaction.commit()
+    assert len(com) == 1
     Comments.delete_by_id(1)
+    transaction.commit()
+    com = Comments.all()
+    transaction.commit()
+    assert len(com) == 0
+
+
+def test_all(req_context, app, auth_req):
+    # assert that there are no entries when we start
+    run_query(req_context.db, "TRUNCATE comment", get_results=False)
+    Comments.create({'text': u'test1', 'user': u'testuser1', 'permalink': u'testperma1'}, reddit=True)
+    transaction.commit()
+    Comments.create({'text': u'test2', 'user': u'testuser2', 'permalink': u'testperma2'}, reddit=True)
+    transaction.commit()
+    Comments.create({'text': u'test3', 'user': u'testuser3', 'permalink': u'testperma3'}, reddit=True)
+    transaction.commit()
+    com = Comments.all()
+    transaction.commit()
+    assert len(com) == 3
 
 
 def test_reddit_connection():
@@ -169,25 +199,21 @@ def test_getting_correct_comments(generate_fr):
     assert comments[0]['text'] == u'Fucking not safe at Fucking all, Shit Shit Shit'
 
 
-def test_approve_comment():
-    pass
-
-
-def test_remove_all():
-    pass
-
-
-def test_edit():
-    pass
-
-
-def tweet_comment():
-    pass
-
-
-def scrape_twitter():
-    pass
-
-
-def scrape_reddit():
-    pass
+def test_approve_comment(req_context, app, auth_req):
+    # assert that there are no entries when we start
+    Comments.create({'text': u'testapproved', 'user': u'testuser1', 'permalink': u'testperma1'}, reddit=True)
+    transaction.commit()
+    com = Comments.all()
+    ci = 0
+    for c in com:
+        if c.text == 'testapproved':
+            com = c
+            break
+    assert com.approved is False
+    ci = com.id
+    transaction.commit()
+    Comments.approve_comment(ci)
+    transaction.commit()
+    com = Comments.by_id(ci)
+    assert com.approved is True
+    transaction.commit()
