@@ -14,6 +14,11 @@ def load_keys():
 
 
 def get_nasty_tweets(handle, tweet_number):
+    """
+    Get most recent [number] tweets from the specified handle. If handle
+    is not specified, grab the feed from DouserBot. Return a dictionary of
+    tweets. Each tweet is its own dictionary with user, text, and permalink.
+    """
 
     keys = load_keys()
 
@@ -33,7 +38,6 @@ def get_nasty_tweets(handle, tweet_number):
         keywords[word] = int(val)
     f.close()
 
-    # tweets_with_keywords = []
     shitty_tweets = {}
     count = 0
     for tweet in tweets:
@@ -49,26 +53,15 @@ def get_nasty_tweets(handle, tweet_number):
             if word in keywords:
                 score += keywords.get(word)
                 if score >= 10:
-                    # tweets_with_keywords.append(tweet)
                     shitty_tweets[count] = make_nasty_tweet(tweet)
                     count += 1
                     break
 
-    # for i in range(len(tweets_with_keywords)):
-    #     user = tweets_with_keywords[i].user.name
-    #     ident = tweets_with_keywords[i].id
-    #     permalink = "www.twitter.com/" + user + "/status/" + str(ident)
-    #     text = tweets_with_keywords[i].text
-    #     shitty_tweets[i] = {
-    #         'text': text,
-    #         'user': user,
-    #         'permalink': permalink
-    #     }
     return shitty_tweets
 
 
 def tweet_it_out(stat):
-
+    """Tweet the given text to DouserBot's timeline."""
     keys = load_keys()
 
     auth = tweepy.OAuthHandler(keys['consumer_key'], keys['consumer_secret'])
@@ -80,6 +73,9 @@ def tweet_it_out(stat):
 
 
 def make_nasty_tweet(tweet):
+    """
+    Turn a tweet into a dictionary with its username, body, and permalink.
+    """
     user = tweet.user.name
     ident = tweet.id
     permalink = "www.twitter.com/" + user + "/status/" + str(ident)
