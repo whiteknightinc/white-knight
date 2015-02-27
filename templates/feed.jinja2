@@ -77,13 +77,14 @@
     {% for comment in comments %}
     {% if not comment.approved %}
     <article class="shame-post">
-            <h3 class="comment_title">{{ comment.username }}</h3>
-            <div class="post">
-              <div class="comment_body" id ="detail_post">
-                {{ comment.text }}
-              </div>
-            </div>
-          </a>
+    <a href="{{ comment.permalink }}" target="_blank">
+      <h3 class="comment_title">{{ comment.username }}</h3>
+      <div class="post">
+        <div class="comment_body" id ="detail_post">
+          {{ comment.text }}
+        </div>
+      </div>
+    </a>
     </article>
     <br>
     <a href="{{ request.route_url('edit_comment', id = comment.id)}}"><button class="edit_button">Prepare for Tweeting!</button></a>
