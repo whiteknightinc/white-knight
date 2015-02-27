@@ -1,7 +1,8 @@
 import praw
 from requests import HTTPError
+from requests import Timeout
 from praw.errors import RedirectException
-
+from time import time
 
 def from_reddit(subreddit, subnumber):
         r = praw.Reddit('Whiteknight scrapping reddit for nasty comments'
@@ -29,6 +30,7 @@ def get_comments(subreddit='all', subnumber=500):
 
     try:
         index = 0
+        timer = time()
         for comment in comments:
             score = 0
             comment_body = comment.body.lower()
@@ -42,13 +44,16 @@ def get_comments(subreddit='all', subnumber=500):
                     if score >= 10:
                         result[index] = make_nasty_comment(comment)
                         index += 1
+                        if (time() - timer) > 25:
+                            return result, True
+                            # raise Timeout
                         break
     except HTTPError:
-        return {}
+        return {}, False
     except RedirectException:
-        return {}
+        return {}, False
 
-    return result
+    return result, False
 
 
 def make_nasty_comment(comment):

@@ -70,7 +70,11 @@
     </form>
   </div>
   <div class='shame_stats'>
+    {% if timeout %}
+    <p>Your scrape timed out</p><br>
+    {% endif %}    
     <p>{{post_count}} post(s) scraped from {{source_name}}!</p>
+
   </div>
   <div class="shame-feed">
   <a href="{{ request.route_url('delete_all') }}"><button class="clear_comments">Clear Comments</button></a>

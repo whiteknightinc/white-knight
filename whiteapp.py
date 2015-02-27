@@ -29,7 +29,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 
 post_count = 0
 source_name = ''
-
+timeout = False
 
 class Comments(Base):
     __tablename__ = 'comment'
@@ -104,10 +104,12 @@ def feed(request):
     """Return the scraped objects from Reddit and Twitter if logged in."""
     global post_count
     global source_name
+    global timeout
     if request.authenticated_userid:
         return {'comments': Comments.all(),
                 'post_count': post_count,
-                'source_name': source_name
+                'source_name': source_name,
+                'timeout': timeout
                 }
     else:
         return HTTPForbidden()
@@ -116,6 +118,8 @@ def feed(request):
 @view_config(route_name='scrape_twitter', request_method='POST')
 def scrape_twitter(request):
     """Scrape over Twitter for posts that fit the parameters establshed."""
+    global timeout
+    timeout = False
     handle = request.params.get('handle', None)
     if handle == "":
         handle = 'DouserBot'
@@ -153,6 +157,8 @@ def get_tweets(handle, tweet_number):
 @view_config(route_name='scrape', request_method='POST')
 def scrape_reddit(request):
     """Scrape over Reddit for posts that fit the parameters establshed."""
+    global timeout
+    timeout = False
     subreddit = request.params.get('subreddit', None)
     if subreddit == "":
         subreddit = 'all'
@@ -160,27 +166,28 @@ def scrape_reddit(request):
         subnumber = int(request.params.get('sub_number', None))
     except TypeError:
         subnumber = 100
-    get_comments_from_reddit(subreddit, subnumber)
+    get_comments_from_reddit(subreddit, subnumber, request)
     return HTTPFound(request.route_url('feed'))
 
 
-def get_comments_from_reddit(subreddit, subnumber):
+def get_comments_from_reddit(subreddit, subnumber, request):
     """
     Run the scraper over Reddit with a
     defined number of comments and a
     specified subreddit.
     """
     try:
-        comments = get_comments(subreddit, subnumber)
+        comments, timeoutbool = get_comments(subreddit, subnumber)
     except ConnectionError:
         raise ConnectionError('connection error')
-    except requests.Timeout:
-        return HTTPFound(requests.route_url('feed'))
     counter = 0
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
             counter += 1
             Comments.create(comments[comment], reddit=True)
+    if timeoutbool:
+        global timeout
+        timeout = True
     global source_name
     source_name = subreddit
     global post_count
