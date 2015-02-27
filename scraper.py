@@ -21,10 +21,7 @@ def from_reddit(subreddit, subnumber):
 def get_comments(subreddit='all', subnumber=500):
     # top_posts = r.get_subreddit(subreddit).get_hot(limit=subnumber)
     result = {}
-    try:
-        comments = from_reddit(subreddit, subnumber)
-    except praw.errors.APIException:
-        raise praw.errors.APIException("reddit's broke")
+    comments = from_reddit(subreddit, subnumber)
     f = open("swearWordsValue.txt")
     keywords = {}
     for line in f:

@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from scraper import get_comments
 from twitter_scraper import get_nasty_tweets
 from twitter_scraper import tweet_it_out
-
+from requests import ConnectionError
 
 DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
 Base = declarative_base()
@@ -98,7 +98,10 @@ class Comments(Base):
 
 
 def get_comments_from_reddit(subreddit, subnumber):
-    comments = get_comments(subreddit, subnumber)
+    try:
+        comments = get_comments(subreddit, subnumber)
+    except ConnectionError:
+        raise ConnectionError('connection error')
     counter = 0
     for comment in comments:
         if not has_entry(comments[comment]['permalink']):
